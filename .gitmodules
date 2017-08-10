@@ -1,0 +1,3 @@
+[submodule "dependencies/FinalStateAnalysis"]
+  path = dependencies/FinalStateAnalysis
+  url = https://github.com/uwcms/FinalStateAnalysis.git

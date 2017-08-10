@@ -1,0 +1,49 @@
+nohup: ignoring input
+mkdir -p `dirname results/LFV_feb18_mc/LFVHEMuAnalyzerMVABDTmet27ttbarxsec/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_v6-v1.root`
+(in /afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_26_patch1/src/UWHiggs/lfv)
+warning: Insecure world writable dir /afs/hep.wisc.edu/cms/ndev in PATH, mode 040777
+time mega LFVHEMuAnalyzerMVABDTmet27ttbarxsec.py inputs/LFV_feb18_mc/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_v6-v1.txt results/LFV_feb18_mc/LFVHEMuAnalyzerMVABDTmet27ttbarxsec/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_v6-v1.root --workers 2 --chain 10
+#using farmout:0
+#dry run:0
+Traceback (most recent call last):
+  File "/afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_26_patch1/src/FinalStateAnalysis//PlotTools/scripts/mega", line 94, in <module>
+    module = __import__(class_name, fromlist=[class_name])
+  File "/cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/lib/ROOT.py", line 303, in _importhook
+    return _orig_ihook( name, *args, **kwds )
+  File "/afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_26_patch1/src/UWHiggs/lfv/LFVHEMuAnalyzerMVABDTmet27ttbarxsec.py", line 17, in <module>
+    import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections as MuonPOGCorrections
+  File "/cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/lib/ROOT.py", line 303, in _importhook
+    return _orig_ihook( name, *args, **kwds )
+  File "/afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_26_patch1/python/FinalStateAnalysis/TagAndProbe/MuonPOGCorrections.py", line 35, in <module>
+    os.path.join(os.environ['fsa'], 'TagAndProbe/data/muon_ratios_tracking.root')
+  File "/afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_26_patch1/python/FinalStateAnalysis/TagAndProbe/graphReader.py", line 179, in __init__
+    gr1 = input_file.Get("ratio_eta")
+  File "/afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_26_patch1/src/FinalStateAnalysis/recipe/external/src/rootpy/rootpy/io/file.py", line 77, in get
+    thing = f(self, _name, *args, **kwargs)
+  File "/afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_26_patch1/src/FinalStateAnalysis/recipe/external/src/rootpy/rootpy/io/file.py", line 346, in Get
+    return asrootpy(thing, **kwargs)
+  File "/afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_26_patch1/src/FinalStateAnalysis/recipe/external/src/rootpy/rootpy/__init__.py", line 250, in asrootpy
+    rootpy_cls = lookup(thing_cls)
+  File "/afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_26_patch1/src/FinalStateAnalysis/recipe/external/src/rootpy/rootpy/__init__.py", line 276, in lookup
+    return lookup_by_name(cls_name)
+  File "/afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_26_patch1/src/FinalStateAnalysis/recipe/external/src/rootpy/rootpy/__init__.py", line 292, in lookup_by_name
+    rootpy_cls = _get_class(cls_path, rootpy_cls_name)
+  File "/afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_26_patch1/src/FinalStateAnalysis/recipe/external/src/rootpy/rootpy/__init__.py", line 270, in _get_class
+    'rootpy.' + path, globals(), locals(), [name], 0)
+  File "/cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/lib/ROOT.py", line 303, in _importhook
+    return _orig_ihook( name, *args, **kwds )
+  File "/afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_26_patch1/src/FinalStateAnalysis/recipe/external/src/rootpy/rootpy/plotting/__init__.py", line 12, in <module>
+    from .hist import Hist, Hist1D, Hist2D, Hist3D, Efficiency, HistStack, histogram
+  File "/cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/lib/ROOT.py", line 303, in _importhook
+    return _orig_ihook( name, *args, **kwds )
+  File "/afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_26_patch1/src/FinalStateAnalysis/recipe/external/src/rootpy/rootpy/plotting/hist.py", line 2259, in <module>
+    snake_case_methods(cls)
+  File "/afs/hep.wisc.edu/cms/ndev/CMSSW_8_0_26_patch1/src/FinalStateAnalysis/recipe/external/src/rootpy/rootpy/decorators.py", line 147, in snake_case_methods
+    for name, member in members:
+KeyboardInterrupt
+2.68user 1.23system 0:19.19elapsed 20%CPU (0avgtext+0avgdata 148236maxresident)k
+380368inputs+32outputs (1708major+66546minor)pagefaults 0swaps
+rake aborted!
+Command failed with status (1): [time mega LFVHEMuAnalyzerMVABDTmet27ttbarx...]
+
+(See full trace by running task with --trace)
