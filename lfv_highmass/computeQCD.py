@@ -1,4 +1,4 @@
-import array
+B1;2cimport array
 import os 
 from sys import argv, stdout, stderr
 import ROOT
@@ -55,7 +55,7 @@ args = parser.parse_args()
 
 number_of_categories=4
 
-categories=['0','1','2','3']   #category names in analyzer                                                                                    
+categories=['0','1','2']   #category names in analyzer                                                                                    
 
 syst_names=[]      #sysfolder names in analyzer                                             
 if args.doSyst:                                                                                                                                              

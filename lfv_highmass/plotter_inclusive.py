@@ -182,14 +182,19 @@ hist_SM=file.Get("mutaue_inclus").Get("ggH_htt")
 hist_SM.Add(file.Get("mutaue_inclus").Get("qqH_htt"))
 hist_SM.Add(file.Get("mutaue_inclus").Get("ggH_hww"))
 hist_SM.Add(file.Get("mutaue_inclus").Get("qqH_hww"))
+ 
+Lumi_uncert=0.026
+e_eff_uncert=0.02
+mu_eff_uncert=0.02
 
+squared_sum_others=Lumi_uncert*Lumi_uncert+e_eff_uncert*e_eff_uncert+mu_eff_uncert*mu_eff_uncert
 for k in range(1,hist_ZTT.GetSize()-1):
-   hist_TT.SetBinError(k,(0.10*hist_TT.GetBinContent(k)*0.10*hist_TT.GetBinContent(k)+hist_TT.GetBinError(k)*hist_TT.GetBinError(k))**0.5)
-   hist_ZTT.SetBinError(k,(0.10*hist_ZTT.GetBinContent(k)*0.10*hist_ZTT.GetBinContent(k)+hist_ZTT.GetBinError(k)*hist_ZTT.GetBinError(k))**0.5)
-   hist_ZL.SetBinError(k,(0.12*hist_ZL.GetBinContent(k)*0.12*hist_ZL.GetBinContent(k)+hist_ZL.GetBinError(k)*hist_ZL.GetBinError(k))**0.5)
-   hist_Fakes.SetBinError(k,(0.30*hist_Fakes.GetBinContent(k)*0.30*hist_Fakes.GetBinContent(k)+hist_Fakes.GetBinError(k)*hist_Fakes.GetBinError(k))**0.5)
-   hist_VV.SetBinError(k,(0.05*hist_VV.GetBinContent(k)*0.05*hist_VV.GetBinContent(k)+hist_VV.GetBinError(k)*hist_VV.GetBinError(k))**0.5)
-   hist_SM.SetBinError(k,(0.10*hist_SM.GetBinContent(k)*0.10*hist_SM.GetBinContent(k)+hist_SM.GetBinError(k)*hist_SM.GetBinError(k))**0.5)
+   hist_TT.SetBinError(k,(squared_sum_others*hist_TT.GetBinContent(k)*hist_TT.GetBinContent(k)+0.10*hist_TT.GetBinContent(k)*0.10*hist_TT.GetBinContent(k)+hist_TT.GetBinError(k)*hist_TT.GetBinError(k))**0.5)
+   hist_ZTT.SetBinError(k,(squared_sum_others*hist_ZTT.GetBinContent(k)*hist_ZTT.GetBinContent(k)+0.10*hist_ZTT.GetBinContent(k)*0.10*hist_ZTT.GetBinContent(k)+hist_ZTT.GetBinError(k)*hist_ZTT.GetBinError(k))**0.5)
+   hist_ZL.SetBinError(k,(squared_sum_others*hist_ZL.GetBinContent(k)*hist_ZL.GetBinContent(k)+0.12*hist_ZL.GetBinContent(k)*0.12*hist_ZL.GetBinContent(k)+hist_ZL.GetBinError(k)*hist_ZL.GetBinError(k))**0.5)
+   hist_Fakes.SetBinError(k,(squared_sum_others*hist_Fakes.GetBinContent(k)*hist_Fakes.GetBinContent(k)+0.30*hist_Fakes.GetBinContent(k)*0.30*hist_Fakes.GetBinContent(k)+hist_Fakes.GetBinError(k)*hist_Fakes.GetBinError(k))**0.5)
+   hist_VV.SetBinError(k,(squared_sum_others*hist_VV.GetBinContent(k)*hist_VV.GetBinContent(k)+0.05*hist_VV.GetBinContent(k)*0.05*hist_VV.GetBinContent(k)+hist_VV.GetBinError(k)*hist_VV.GetBinError(k))**0.5)
+#   hist_SM.SetBinError(k,(squared_sum_others*hist_SM+0.10*hist_SM.GetBinContent(k)*0.10*hist_SM.GetBinContent(k)+hist_SM.GetBinError(k)*hist_SM.GetBinError(k))**0.5)
 
 hist_Fakes.SetFillColor(ROOT.TColor.GetColor("#ffccff"))
 hist_Fakes.SetLineColor(1)
@@ -303,7 +308,7 @@ errorBand.Draw("e2same")
 
 for histo in signal_histos:
     if args.isLog:
-        histo[0].Scale(higgsSF/5)
+        histo[0].Scale(higgsSF)
     else:
         histo[0].Scale(higgsSF)
     histo[0].Draw("histsame")

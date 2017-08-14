@@ -37,12 +37,14 @@ python plotter_inclusive.py --inputFile preprocessed_inputs/$analyzer$luminosity
 python plotter_inclusive.py --inputFile preprocessed_inputs/$analyzer$luminosity/inclusive/ePFMET_DeltaPhi.root --direc $analyzer  --var dphiEMet
 python plotter_inclusive.py --inputFile preprocessed_inputs/$analyzer$luminosity/inclusive/mPFMET_DeltaPhi.root --direc $analyzer  --var dphiMuMet
 python plotter_inclusive.py --inputFile preprocessed_inputs/$analyzer$luminosity/inclusive/h_collmass_pfmet.root --direc $analyzer --isLog  --var colmass
+python plotter_inclusive.py --inputFile preprocessed_inputs/$analyzer$luminosity/inclusive/h_vismass.root --direc $analyzer --isLog  --var vismass
 python plotter_inclusive.py --inputFile preprocessed_inputs/$analyzer$luminosity/inclusive/em_DeltaPhi.root --direc $analyzer  --var dphiemu
 #python plotter_inclusive.py --inputFile preprocessed_inputs/inclusive/$analyzer//BDT_value.root --direc ztautau_CR --isLog --var BDT
 
 
 #make preselection plots
 python plotter.py --inputFile preprocessed_inputs/highmass35847/preselection/h_collmass_pfmet.root --channel "me"  --prefix "presel" --blind 1 --isLog 1
+python plotter.py --inputFile preprocessed_inputs/highmass35847/preselection/h_vismass.root --channel "me"  --prefix "presel" --blind 1 --isLog 1 --var vismass
 python plotter.py --inputFile preprocessed_inputs/highmass35847/preselection/mPt.root --channel "me"  --prefix "presel" --blind 1 --isLog 1 --var mPt
 python plotter.py --inputFile preprocessed_inputs/highmass35847/preselection/ePt.root --channel "me"  --prefix "presel" --blind 1 --isLog 1 --var ePt
 python plotter.py --inputFile preprocessed_inputs/highmass35847/preselection/mPFMET_Mt.root --channel "me"  --prefix "presel" --blind 1 --isLog 1 --var mtMuMet
@@ -50,3 +52,9 @@ python plotter.py --inputFile preprocessed_inputs/highmass35847/preselection/ePF
 python plotter.py --inputFile preprocessed_inputs/highmass35847/preselection/ePFMET_DeltaPhi.root --channel "me"  --prefix "presel" --blind 1  --var dphiEMet
 python plotter.py --inputFile preprocessed_inputs/highmass35847/preselection/mPFMET_DeltaPhi.root --channel "me"  --prefix "presel" --blind 1  --var dphiMuMet
 python plotter.py --inputFile preprocessed_inputs/highmass35847/preselection/em_DeltaPhi.root --channel "me"  --prefix "presel" --blind 1  --var dphiemu
+
+
+#make preselection plots
+python plotter.py --inputFile preprocessed_inputs/highmass35847/selection/h_collmass_pfmet.root --channel "me"  --prefix "selected" --blind 1 --isLog 1
+python plotter.py --inputFile preprocessed_inputs/highmass35847/selection/h_vismass.root --channel "me"  --prefix "selected" --blind 1 --isLog 1 --var vismass
+

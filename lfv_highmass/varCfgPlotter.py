@@ -57,25 +57,25 @@ def getInfoMap( higgsSF, channel, shift="" ) :
     if channel == "me" : sub = ("#mu", "e")
     
     infoMap = OrderedDict()
-    # Name : Add these shapes [...], legend name, leg type, fill color
+    # Name : Add these shapes [...], legend name, leg type, fill color,norm uncertainty on x-sec,line-style(only for signals)
     infoMap["data_obs"] = [["data_obs",],"Observed","elp",1]
-    infoMap["ZTT"] = [["ZTauTau"+shift],"Z#rightarrow#tau#tau","f","#ffcc66"]
-    infoMap["ZJ"] = [["Zothers"+shift],"Z#rightarrowee/#mu#mu","f","#4496c8"]
-    infoMap["TT"] = [["TT"+shift,"T"+shift],"t#bar{t},t+jets","f","#9999cc"]
-    infoMap["Diboson"] = [["Diboson"+shift],"Diboson","f","#12cadd"]
+    infoMap["ZTT"] = [["ZTauTau"+shift],"Z#rightarrow#tau#tau","f","#ffcc66",0.10]
+    infoMap["ZJ"] = [["Zothers"+shift],"Z#rightarrowee/#mu#mu","f","#4496c8",0.10]
+    infoMap["TT"] = [["TT"+shift,"T"+shift],"t#bar{t},t+jets","f","#9999cc",0.12]
+    infoMap["Diboson"] = [["Diboson"+shift],"Diboson","f","#12cadd",0.05]
     if channel=="et" or channel=="mt":
        infoMap["QCD"] = [["Fakes",],"Reducible","f","#ffccff"]
     if channel == "me" or channel=="em":
-       infoMap["QCD"] = [["QCD","W"+shift],"Reducible","f","#ffccff"]
+       infoMap["QCD"] = [["QCD","W"+shift],"Reducible","f","#ffccff",0.30]
     if channel=="em" or channel=="et":
        infoMap["H125"] = [["LFVGG125"+shift,"LFVVBF125"+shift,],"H#rightarrowe#tau (B=%i%%)"%higgsSF,"l","#111bbb"]
     elif channel=="me" or channel=="mt":
-       infoMap["LFV200"] = [["LFV200"],"LFV200","l",ROOT.kRed,1]
-       infoMap["LFV300"] = [["LFV300"],"LFV300","l",ROOT.kBlack,1]
-       infoMap["LFV450"] = [["LFV450"],"LFV450","l",ROOT.kBlue,1]
-       infoMap["LFV600"] = [["LFV600"],"LFV600","l",ROOT.kRed,2]
-       infoMap["LFV750"] = [["LFV750"],"LFV750","l",ROOT.kBlack,2]
-       infoMap["LFV900"] = [["LFV900"],"LFV900","l",ROOT.kBlue,2]
+       infoMap["LFV200"] = [["LFV200"],"LFV200","l",ROOT.kRed,0,1]
+       infoMap["LFV300"] = [["LFV300"],"LFV300","l",ROOT.kBlack,0,1]
+       infoMap["LFV450"] = [["LFV450"],"LFV450","l",ROOT.kBlue,0,1]
+       infoMap["LFV600"] = [["LFV600"],"LFV600","l",ROOT.kRed,0,2]
+       infoMap["LFV750"] = [["LFV750"],"LFV750","l",ROOT.kBlack,0,2]
+       infoMap["LFV900"] = [["LFV900"],"LFV900","l",ROOT.kBlue,0,2]
 
     return infoMap
 

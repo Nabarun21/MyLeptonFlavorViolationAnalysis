@@ -61,8 +61,8 @@ parser.add_argument(
     type=int,
     action="store",
     dest="higgsSF",
-    default=50,
-    help="Provide the Scale Factor for the SM-Higgs signals.  50x is default for linear, 5x for log")
+    default=40,
+    help="Provide the Scale Factor for the SM-Higgs signals.  40x is default for linear")
 parser.add_argument(
     "--higgsSFSM",
     type=int,
@@ -97,6 +97,11 @@ varnames['dphiEMet']='#Delta#phi[e, MET] '
 varnames['dphiMuMet']='#Delta#phi[#mu, MET] '
 varnames['BDT']='BDT Discriminator'
 varnames['dphiemu']='#Delta#phi [e, #mu]'
+ 
+Lumi_uncert=0.026
+e_eff_uncert=0.02
+mu_eff_uncert=0.02
+squared_sum_others=Lumi_uncert*Lumi_uncert+e_eff_uncert*e_eff_uncert+mu_eff_uncert*mu_eff_uncert
 
 Lumi=args.Lumi
 direc=args.direc
@@ -292,9 +297,13 @@ for cat in categories:
                 continue
             hists[ name ].Add( initHists[ toAdd ] )
     
-        if name not in signals :
+        if name not in signals  :
             hists[ name ].SetFillColor(ROOT.TColor.GetColor( val[3] ) )
             hists[ name ].SetLineColor(1)
+            if 'data' not in name:
+                for k in range(1,hists[name].GetSize()-1):
+                    hists[name].SetBinError(k,(squared_sum_others*hists[name].GetBinContent(k)*hists[name].GetBinContent(k)+val[4]*hists[name].GetBinContent(k)*val[4]*hists[name].GetBinContent(k)+hists[name].GetBinError(k)*hists[name].GetBinError(k))**0.5)
+
         
     # Set aesthetics
     hists["data_obs"].GetXaxis().SetTitle("")
@@ -317,7 +326,7 @@ for cat in categories:
     for sig in signals :
 #	print sig
         hists[ sig ].SetLineColor(infoMap[ sig ][3] )
-        hists[sig].SetLineStyle(infoMap[sig][4])
+        hists[sig].SetLineStyle(infoMap[sig][5])
         hists[ sig ].SetLineWidth(4)
         
         #hists[ sig ].SetLineStyle(2)
@@ -391,7 +400,7 @@ for cat in categories:
     errorBand.Draw("e2same")
     for sig in signals :
         if isLog:
-            hists[ sig ].Scale(higgsSF/10)
+            hists[ sig ].Scale(higgsSF)
         else:
             hists[ sig ].Scale(higgsSF)
 
@@ -506,16 +515,27 @@ for cat in categories:
     c.Modified()
     if not os.path.exists( 'plots' ) : os.makedirs( 'plots' )
     if not os.path.exists("plots/"+direc+str(args.Lumi)):os.makedirs("plots/"+direc+str(args.Lumi))
-    if not os.path.exists("plots/"+direc+str(args.Lumi)+"/preselection"):os.makedirs("plots/"+direc+str(args.Lumi)+"/preselection")
+    
+    if args.prefix=='presel':
+        if not os.path.exists("plots/"+direc+str(args.Lumi)+"/preselection"):os.makedirs("plots/"+direc+str(args.Lumi)+"/preselection")
 
-    if isLog:
-       c.SaveAs("plots/"+direc+str(args.Lumi)+"/preselection/"+"log_"+cat+"_"+variable+".pdf")
-#       c.SaveAs("plots/"+direc+str(args.Lumi)+"/preselection/"+"log_"+cat+"_"+variable+".pdf")
-    else:
-        c.SaveAs("plots/"+direc+str(args.Lumi)+"/preselection/"+cat+"_"+variable+".pdf")
-#       c.SaveAs("plots/"+direc+str(args.Lumi)+"/preselection/"+cat+"_"+variable+".pdf")
+        if isLog:
+            c.SaveAs("plots/"+direc+str(args.Lumi)+"/preselection/"+"log_"+cat+"_"+variable+".pdf")
+    #       c.SaveAs("plots/"+direc+str(args.Lumi)+"/preselection/"+"log_"+cat+"_"+variable+".pdf")
+        else:
+            c.SaveAs("plots/"+direc+str(args.Lumi)+"/preselection/"+cat+"_"+variable+".pdf")
+    #       c.SaveAs("plots/"+direc+str(args.Lumi)+"/preselection/"+cat+"_"+variable+".pdf")
  
+    else:
+        if not os.path.exists("plots/"+direc+str(args.Lumi)+"/selection"):os.makedirs("plots/"+direc+str(args.Lumi)+"/selection")
 
+        if isLog:
+            c.SaveAs("plots/"+direc+str(args.Lumi)+"/selection/"+"log_"+cat+"_"+variable+".pdf")
+    #       c.SaveAs("plots/"+direc+str(args.Lumi)+"/selection/"+"log_"+cat+"_"+variable+".pdf")
+        else:
+            c.SaveAs("plots/"+direc+str(args.Lumi)+"/selection/"+cat+"_"+variable+".pdf")
+    #       c.SaveAs("plots/"+direc+str(args.Lumi)+"/selection/"+cat+"_"+variable+".pdf")
+        
      
     for bkg in bkgs:
 	print bkg," : ",hists[bkg].Integral()    
