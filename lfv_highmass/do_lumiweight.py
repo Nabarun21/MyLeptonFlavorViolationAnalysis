@@ -126,61 +126,67 @@ commonvars=[
    ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 1),
    ]
 
-category="mutaue_inclus"
+categories=["mutaue_0jet_presel","mutaue_1jet_presel","mutaue_2jet_presel"]
+
+try:
+   os.makedirs(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/preselection")
+except Exception as ex:
+   print ex
+
 
 for var in commonvars:
    histos={}
-   histos[category]=[]
-   for filename in os.listdir('AnalyzerMuE'+args.analyzer_name+str(args.Lumi)):
-      if "FAKES" in filename or "ETau" in filename :continue
-      file=ROOT.TFile('AnalyzerMuE'+args.analyzer_name+str(args.Lumi)+'/'+filename)
-      new_title=filename.split('.')[0]
-      hist_path="os/"+var[0]
-      histo=file.Get(hist_path)
+   for i_cat in range(len(categories)):
+      histos[categories[i_cat]]=[]
+      for filename in os.listdir('AnalyzerMuE'+args.analyzer_name+str(args.Lumi)):
+         if "FAKES" in filename or "ETau" in filename :continue
+         file=ROOT.TFile('AnalyzerMuE'+args.analyzer_name+str(args.Lumi)+'/'+filename)
+         new_title=filename.split('.')[0]
+         hist_path="os/"+str(i_cat)+"/"+var[0]
+         histo=file.Get(hist_path)
         # print histo.GetNbinsX()
-      rebin=var[2]
+         rebin=var[2]
 
-      if not histo:
-         continue
+         if not histo:
+            continue
 
-      histo.Rebin(rebin*2)
+         histo.Rebin(rebin*2)
 
-      if 'data' not in filename and 'QCD' not in filename:
-         histo.Scale(lumidict['data_obs']/lumidict[new_title])      
-      if 'data' in filename:
-         histo.SetBinErrorOption(ROOT.TH1.kPoisson)
+         if 'data' not in filename and 'QCD' not in filename:
+            histo.Scale(lumidict['data_obs']/lumidict[new_title])      
+         if 'data' in filename:
+            histo.SetBinErrorOption(ROOT.TH1.kPoisson)
 
-      lowBound=0
-      highBound=histo.GetNbinsX()
-      for bin in range(1,highBound):
-         if histo.GetBinContent(bin) != 0:
+         lowBound=0
+         highBound=histo.GetNbinsX()
+         for bin in range(1,highBound):
+            if histo.GetBinContent(bin) != 0:
 #            print histo.GetBinContent(bin),bin
-            lowBound = bin
-            break
-      for bin in range(histo.GetNbinsX(),lowBound,-1):
-         if histo.GetBinContent(bin) != 0:
-            highBound = bin
-            break
-      for j in range(lowBound, highBound+1):
-         if lowBound==0:continue
-         if (histo.GetBinContent(j)<=0) and "data" not in filename and "LFV" not in filename:
-            histo.SetBinContent(j,0.001*float((lumidict['data_obs'])*float(lumidict2[new_title])))
-            histo.SetBinError(j,1.8*float((lumidict['data_obs'])*float(lumidict2[new_title])))
-#            print "found neg bin  ",j
+               lowBound = bin
+               break
+         for bin in range(histo.GetNbinsX(),lowBound,-1):
+            if histo.GetBinContent(bin) != 0:
+               highBound = bin
+               break
+         for j in range(lowBound, highBound+1):
+            if lowBound==0:continue
+            if (histo.GetBinContent(j)<=0) and "data" not in filename and "LFV" not in filename:
+               histo.SetBinContent(j,0.001*float((lumidict['data_obs'])*float(lumidict2[new_title])))
+               histo.SetBinError(j,1.8*float((lumidict['data_obs'])*float(lumidict2[new_title])))
+             #            print "found neg bin  ",j
 
-      histo.SetTitle(new_title)
-      histo.SetName(new_title)
-      new_histo=copy.copy(histo)
-      histos[category].append(new_histo)
+         histo.SetTitle(new_title)
+         histo.SetName(new_title)
+         new_histo=copy.copy(histo)
+         histos[categories[i_cat]].append(new_histo)
+
 
    if not histo:
+      print "couldn't find histo for ",var[0]
       continue
-   try:
-         os.makedirs(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/inclusive")
-   except Exception as ex:
-                         print ex
 
-   outputfile=ROOT.TFile(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/inclusive/"+var[0]+".root","recreate")
+   
+   outputfile=ROOT.TFile(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/preselection/"+var[0]+".root","recreate")
 
 #   print outputfile
    outputfile.cd()

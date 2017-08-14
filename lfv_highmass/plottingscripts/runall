@@ -1,0 +1,20 @@
+rm plots/*
+
+python plotter.py --inputFile unblinded/output_shapes_BDT_HETAU_36fb_Unblinded.root --channel "et"  --prefix "postfit" --blind 0 --xlabel "BDT discriminator"  
+python plotter.py --inputFile unblinded/output_shapes_BDT_HETAU_36fb_Unblinded.root --channel "em"  --prefix "postfit" --blind 0 --xlabel "BDT discriminator" 
+python plotter.py --inputFile unblinded/output_shapes_BDT_HMUTAU_36fb_Unblinded.root --channel "mt"  --prefix "postfit" --blind 0 --xlabel "BDT discriminator" 
+python plotter.py --inputFile unblinded/output_shapes_BDT_HMUTAU_36fb_Unblinded.root --channel "me"  --prefix "postfit" --blind 0 --xlabel "BDT discriminator" 
+
+mkdir -p plotsnoprelimBDT/
+mv plots/* plotsnoprelimBDT/
+
+
+python plotter.py --inputFile unblinded/output_shapes_CB_HETAU_36fb_Unblinded.root --channel "et"  --prefix "postfit" --blind 0  
+python plotter.py --inputFile unblinded/output_shapes_CB_HETAU_36fb_Unblinded.root --channel "em"  --prefix "postfit" --blind 0  
+python plotter.py --inputFile unblinded/output_shapes_CB_HMUTAU_36fb_Unblinded.root --channel "mt"  --prefix "postfit" --blind 0 
+python plotter.py --inputFile unblinded/output_shapes_CB_HMUTAU_36fb_Unblinded.root --channel "me"  --prefix "postfit" --blind 0 
+
+mkdir -p plotsnoprelimCB/
+mv plots/* plotsnoprelimCB/  
+
+

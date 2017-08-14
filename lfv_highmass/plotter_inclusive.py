@@ -10,16 +10,13 @@ parser = argparse.ArgumentParser(
     "Create pre/post-fit plots for LFV H analysis")
 parser.add_argument(
     "--isLog",
-    type=int,
-    action="store",
-    dest="isLog",
-    default=0,
-    help="Plot Log Y? (Integers 0, false, 1 true)")
+    action="store_true",
+    help="Plot Log Y? ")
 parser.add_argument(
     "--channel",
     action="store",
     dest="channel",
-    default="et",
+    default="me",
     help="Which channel to run over? (et, mt, em, me)")
 parser.add_argument(
     "--var",
@@ -29,12 +26,19 @@ parser.add_argument(
     default="ePt",
     help="Which channel to run over? (et, mt, em, me)")
 parser.add_argument(
+    "--lumi",
+    type=int,
+    action="store",
+    dest="Lumi",
+    default=35847,
+    help="Which channel to run over? (et, mt, em, me)")
+parser.add_argument(
     "--direc",
     type=str,
     action="store",
     dest="direc",
-    default="ePt",
-    help="Which channel to run over? (et, mt, em, me)")
+    default="highmass",
+    help="name of subfolder in plots directory to save plots")
 parser.add_argument(
     "--prefix",
     action="store",
@@ -46,8 +50,8 @@ parser.add_argument(
     type=int,
     action="store",
     dest="higgsSF",
-    default=20,
-    help="Provide the Scale Factor for the SM-Higgs signals.  20x is default")
+    default=50,
+    help="Provide the Scale Factor for the SM-Higgs signals.  50x is default")
 parser.add_argument(
     "--inputFile",
     action="store",
@@ -122,8 +126,15 @@ def add_Preliminary():
     return lumi
 
 def make_legend():
-	output = ROOT.TLegend(0.5, 0.60, 0.93, 0.88, "", "brNDC")
-        output.SetNColumns(2)
+	if 'dphi' in variable and 'Met' in variable:
+	   output = ROOT.TLegend(0.30, 0.6, 0.92, 0.88, "", "brNDC")
+           output.SetNColumns(5)
+           output.SetTextSize(0.024)
+	else:
+           #output = ROOT.TLegend(0.65, 0.3, 0.92, 0.85, "", "brNDC")
+	   output = ROOT.TLegend(0.42, 0.5, 0.92, 0.88, "", "brNDC")
+           output.SetNColumns(2)
+           output.SetTextSize(0.028)
         #output = ROOT.TLegend(0.2, 0.1, 0.47, 0.65, "", "brNDC")
         output.SetLineWidth(0)
         output.SetLineStyle(0)
@@ -131,14 +142,14 @@ def make_legend():
         #output.SetFillColor(0)
         output.SetBorderSize(0)
         output.SetTextFont(62)
-        output.SetTextSize(0.028)
+
         return output
 
 ROOT.gStyle.SetFrameLineWidth(3)
 ROOT.gStyle.SetLineWidth(3)
 ROOT.gStyle.SetOptStat(0)
 ROOT.gROOT.SetBatch(True)
-ROOT.TGaxis.SetMaxDigits(3)
+ROOT.TGaxis.SetMaxDigits(4)
 
 
 c=ROOT.TCanvas("canvas","",0,0,800,800)
@@ -150,14 +161,20 @@ new_idx=ROOT.gROOT.GetListOfColors().GetSize() + 1
 trans=ROOT.TColor(new_idx, adapt.GetRed(), adapt.GetGreen(),adapt.GetBlue(), "",0.5)
 
 hist_ZTT=file.Get("mutaue_inclus").Get("ZTauTau")
-
 hist_Fakes=file.Get("mutaue_inclus").Get("QCD")
 hist_Fakes.Add(file.Get("mutaue_inclus").Get("W"))
 
 hist_TT=file.Get("mutaue_inclus").Get("TT")
 hist_TT.Add(file.Get("mutaue_inclus").Get("T"))
-hist_sig=file.Get("mutaue_inclus").Get("LFVGG125")
-hist_sig.Add(file.Get("mutaue_inclus").Get("LFVVBF125"))
+hist_sig200=file.Get("mutaue_inclus").Get("LFV200")
+hist_sig300=file.Get("mutaue_inclus").Get("LFV300")
+hist_sig450=file.Get("mutaue_inclus").Get("LFV450")
+hist_sig600=file.Get("mutaue_inclus").Get("LFV600")
+hist_sig750=file.Get("mutaue_inclus").Get("LFV750")
+hist_sig900=file.Get("mutaue_inclus").Get("LFV900")
+
+signal_histos=[(hist_sig200,"LFV200"), (hist_sig300,"LFV300"), (hist_sig450,"LFV450"), (hist_sig600,"LFV600"), (hist_sig750,"LFV750"), (hist_sig900,"LFV900")]
+
 hist_VV=file.Get("mutaue_inclus").Get("Diboson")
 hist_data=file.Get("mutaue_inclus").Get("data_obs")
 hist_ZL=file.Get("mutaue_inclus").Get("Zothers")
@@ -185,20 +202,31 @@ hist_ZL.SetLineColor(1)
 hist_TT.SetFillColor(ROOT.TColor.GetColor("#9999cc"))
 hist_TT.SetLineColor(1)
 hist_SM.SetFillColor(ROOT.TColor.GetColor("#c243cd"))
-hist_sig.SetLineColor(ROOT.TColor.GetColor("#ff1111"))
+
+hist_sig200.SetLineColor(ROOT.kRed)
+hist_sig300.SetLineColor(ROOT.kBlack)
+hist_sig450.SetLineColor(ROOT.kBlue)
+
+hist_sig600.SetLineColor(ROOT.kRed)
+hist_sig600.SetLineStyle(2)
+hist_sig750.SetLineColor(ROOT.kBlack)
+hist_sig750.SetLineStyle(2)
+hist_sig900.SetLineColor(ROOT.kBlue)
+hist_sig900.SetLineStyle(2)
+
 hist_SM.SetLineColor(1)
 hist_data.SetLineColor(1)
 
 mystack=ROOT.THStack("mystack","")
 mystack.Add(hist_Fakes)
-mystack.Add(hist_SM)
+#mystack.Add(hist_SM)
 mystack.Add(hist_VV)
 mystack.Add(hist_TT)
 mystack.Add(hist_ZL)
 mystack.Add(hist_ZTT)
 
 errorBand=hist_Fakes.Clone()
-errorBand.Add(hist_SM)
+#errorBand.Add(hist_SM)
 errorBand.Add(hist_VV)
 errorBand.Add(hist_TT)
 errorBand.Add(hist_ZL)
@@ -221,7 +249,9 @@ hist_data.GetXaxis().SetTitle(varnames[variable])
 hist_data.SetMarkerStyle(20)
 hist_data.SetMarkerSize(1)
 hist_data.SetLineWidth(1)
-hist_sig.SetLineWidth(5)
+
+for histo in signal_histos:
+    histo[0].SetLineWidth(4)
 
 errorBand.SetMarkerSize(0)
 errorBand.SetFillColor(new_idx)
@@ -229,6 +259,8 @@ errorBand.SetFillStyle(3001)
 errorBand.SetLineWidth(1)
 
 c.cd()
+if args.isLog:
+    c.SetLogy()
 c.SetFillColor(0)
 c.SetBorderMode(0)
 c.SetBorderSize(10)
@@ -243,20 +275,43 @@ c.SetFrameLineStyle(0)
 c.SetFrameLineWidth(3)
 c.SetFrameBorderMode(0)
 c.SetFrameBorderSize(10)
-if 'dphi' in variable:
-    hist_data.SetMaximum(1.8*max(mystack.GetMaximum(),hist_data.GetMaximum()))
-elif 'ttbar' in direc :
-    hist_data.SetMaximum(1.75*max(mystack.GetMaximum(),hist_data.GetMaximum()))
-else    :
-    hist_data.SetMaximum(1.6*max(mystack.GetMaximum(),hist_data.GetMaximum()))
-hist_data.SetMinimum(0.0)
+for histo in signal_histos:
+    for bin in range(histo[0].GetNbinsX()+1):
+        bg_count=mystack.GetStack().Last().GetBinContent(bin)
+        sig_count=histo[0].GetBinContent(bin)
+        if sig_count<=0:
+            continue
+        if (float(sig_count)/float(sig_count+bg_count)>0.0050):#blind if if s/(s+b)>0.5%
+            hist_data.SetBinContent(bin,0)
+            hist_data.SetBinError(bin,0)
+
+
+#mystack.SetMaximum(1000*mystack.GetMaximum())
+if args.isLog:
+    hist_data.SetMaximum(10000*hist_data.GetMaximum())
+else:
+    hist_data.SetMaximum(1.7*hist_data.GetMaximum())
+#errorBand.SetMaximum(1000*mystack.GetMaximum())
+#hist_data.SetMinimum(0.00000000001)
+hist_data.SetMinimum(0.0001)
+mystack.SetMinimum(0.00001)
 hist_data.Draw("ep")
 mystack.Draw("histsame")
+
+
 errorBand.Draw("e2same")
-hist_sig.Scale(higgsSF)
-#if "QCD" in direc or "SR" in direc:
-hist_sig.Draw("histsame")
+
+for histo in signal_histos:
+    if args.isLog:
+        histo[0].Scale(higgsSF/5)
+    else:
+        histo[0].Scale(higgsSF)
+    histo[0].Draw("histsame")
+
+
+
 hist_data.Draw("esame")
+#mystack.Draw("histsame")
 
 legend=make_legend()
 legend.AddEntry(hist_data, "Observed","elp")
@@ -265,9 +320,10 @@ legend.AddEntry(hist_ZL, "Z#rightarrowee/#mu#mu","f")
 legend.AddEntry(hist_TT, "t#bar{t},t+jets","f")
 legend.AddEntry(hist_VV, "Diboson","f")
 legend.AddEntry(hist_Fakes, "Reducible","f")
-legend.AddEntry(hist_SM, "SM Higgs","f")
+#legend.AddEntry(hist_SM, "SM Higgs","f")
 #if "QCD" in direc or "SR" in direc:
-legend.AddEntry(hist_sig, "H#rightarrow#mu#tau (B=20%)","l")
+for histo in signal_histos:
+    legend.AddEntry(histo[0],histo[1],"l")
 legend.AddEntry(errorBand,"Bkg. unc.","f")
 legend.Draw()
 
@@ -294,10 +350,11 @@ ROOT.gPad.RedrawAxis()
 
 c.Modified()
 try:
-    os.mkdir("plots/"+direc)
+    os.mkdir("plots/"+direc+str(args.Lumi))
+    os.mkdir("plots/"+direc+str(args.Lumi)+"/inclusive")
 except:
     pass
 
-c.SaveAs("plots/"+direc+"/"+variable.replace("#","")+".pdf")
+c.SaveAs("plots/"+direc+str(args.Lumi)+"/inclusive/"+variable.replace("#","")+".pdf")
 #c.SaveAs("plots/"+ePt.png")
  

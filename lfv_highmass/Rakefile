@@ -340,7 +340,7 @@ end
 
 
 
-task :runhighmass => get_analyzer_results("LFVHEMuAnalyzerMVAhighmass",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau']+samples['excldiboson']+samples['hww']+samples['htautau'])
+task :runhighmass => get_analyzer_results("Analyzer_MuE_highmass",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau']+samples['excldiboson']+samples['hww']+samples['htautau'])
 
 
 

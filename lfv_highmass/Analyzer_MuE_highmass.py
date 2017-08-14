@@ -87,11 +87,11 @@ eId_corrector = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017( 'no
 erecon_corrector=EGammaPOGCorrections.make_egamma_pog_recon_MORIOND17()
 
 
-class LFVHEMuAnalyzerMVAhighmass(MegaBase):
+class Analyzer_MuE_highmass(MegaBase):
     tree = 'em/final/Ntuple'
     def __init__(self, tree, outfile, **kwargs):
         self.channel='EMu'
-        super(LFVHEMuAnalyzerMVAhighmass, self).__init__(tree, outfile, **kwargs)
+        super(Analyzer_MuE_highmass, self).__init__(tree, outfile, **kwargs)
         target = os.path.basename(os.environ['megatarget'])
         self.target=target
 
@@ -1235,16 +1235,16 @@ class LFVHEMuAnalyzerMVAhighmass(MegaBase):
                 if region!="signal":continue    
                 
                 jn = self.shifted_jetVeto30
-                if jn >= 3:
-                    category=4
-                elif jn==2:
-                    category=2 if self.shifted_vbfMass<550 else 3
+                if jn >= 2:
+                    category=2
+#                elif jn==2:
+ #                   category=2 if self.shifted_vbfMass<550 else 3
                 else:
                     category=jn
                 
                 if sys=='nosys':    
-                    if category!=4:               
-                        self.fill_histos(row,sign,None,True,region,btagweight,'presel')
+#                    if category!=4:               
+                    self.fill_histos(row,sign,None,True,region,btagweight,'presel')
                     folder = sign+'/'+str(int(category))
                     self.fill_histos(row,sign,folder,False,region,btagweight,'presel',qcdshaperegion)
 
@@ -1275,16 +1275,6 @@ class LFVHEMuAnalyzerMVAhighmass(MegaBase):
 #                    if self.shifted_eMtToPfMet > 15 : continue
  #                   if self.shifted_vbfMass < 60 : continue
  #                   if self.shifted_vbfDeta < 0.5 : continue
-                    cut_flow_trk.Fill('jet2loosesel')
-
-                if category == 3 :
-                    if self.my_muon.Pt() < 25: continue 
-                    if self.my_elec.Pt() < 10 : continue  #no cut as only electrons with pt>30 are in the ntuples
-                    if abs(self.shifted_eDPhiToPfMet) > 0.3 : continue
-                    if self.shifted_mMtToPfMet < 15 : continue
-#                    if shifted_eMtToPfMet > 15 : continue
-#                    if shifted_vbfMass < 60 : continue
-#                    if shifted_vbfDeta < 0.5 : continue
                     cut_flow_trk.Fill('jet2tightsel')
 
 
@@ -1367,10 +1357,10 @@ class LFVHEMuAnalyzerMVAhighmass(MegaBase):
                 jn = self.shifted_jetVeto30
                 self.shifted_vbfMass=getattr(row, jetsys.replace('jes','vbfMass'))
 
-                if jn >= 3:
-                    category=4
-                elif jn==2:
-                    category=2 if self.shifted_vbfMass<550 else 3
+                if jn >= 2:
+                    category=2
+#                elif jn==2:
+ #                   category=2 if self.shifted_vbfMass<550 else 3
                 else:
                     category=jn
 
@@ -1412,17 +1402,6 @@ class LFVHEMuAnalyzerMVAhighmass(MegaBase):
  #                   if self.shifted_vbfMass < 60 : continue
  #                   if self.shifted_vbfDeta < 0.5 : continue
                     cut_flow_trk.Fill('jet2loosesel')
-
-                if category == 3 :
-                    if self.my_muon.Pt() < 25: continue 
-                    if self.my_elec.Pt() < 10 : continue  #no cut as only electrons with pt>30 are in the ntuples
-      #              if abs(self.shifted_eDPhiToPfMet) > 0.3 : continue
-       #             if self.shifted_mMtToPfMet < 15 : continue
-#                    if shifted_eMtToPfMet > 15 : continue
-#                    if shifted_vbfMass < 60 : continue
-#                    if shifted_vbfDeta < 0.5 : continue
-                    cut_flow_trk.Fill('jet2tightsel')
-
 
                 folder = sign+'/'+str(int(category))+'/selected/'+jetsys
                 self.fill_histos(row,sign,folder,False,region,btagweight,jetsys,qcdshaperegion,self.pileup)
