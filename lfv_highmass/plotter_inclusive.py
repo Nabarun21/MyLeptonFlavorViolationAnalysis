@@ -70,12 +70,14 @@ varnames['dphiEMet']='#Delta#phi[e, MET] '
 varnames['dphiMuMet']='#Delta#phi[#mu, MET] '
 varnames['BDT']='BDT Discriminator'
 varnames['dphiemu']='#Delta#phi [e, #mu]'
+varnames['met']='MET [GeV]'
+
 direc=args.direc
 variable=args.variable
 channel = args.channel
 higgsSF = args.higgsSF
 fileName = args.inputFile
-
+Lumi=args.Lumi
 file = ROOT.TFile( fileName, "r" )
 
 # Category map for the LaTeX naming of histograms
@@ -96,7 +98,7 @@ def add_lumi():
     lumi.SetTextColor(    1 )
     lumi.SetTextSize(0.045)
     lumi.SetTextFont (   42 )
-    lumi.AddText("35.9 fb^{-1} (13 TeV)")
+    lumi.AddText(str(round(float(Lumi)/1000,1))+"fb^{-1} (13 TeV)")
     return lumi
 
 def add_CMS():
@@ -178,10 +180,10 @@ signal_histos=[(hist_sig200,"LFV200"), (hist_sig300,"LFV300"), (hist_sig450,"LFV
 hist_VV=file.Get("mutaue_inclus").Get("Diboson")
 hist_data=file.Get("mutaue_inclus").Get("data_obs")
 hist_ZL=file.Get("mutaue_inclus").Get("Zothers")
-hist_SM=file.Get("mutaue_inclus").Get("ggH_htt")
-hist_SM.Add(file.Get("mutaue_inclus").Get("qqH_htt"))
-hist_SM.Add(file.Get("mutaue_inclus").Get("ggH_hww"))
-hist_SM.Add(file.Get("mutaue_inclus").Get("qqH_hww"))
+#hist_SM=file.Get("mutaue_inclus").Get("ggH_htt")
+#hist_SM.Add(file.Get("mutaue_inclus").Get("qqH_htt"))
+#hist_SM.Add(file.Get("mutaue_inclus").Get("ggH_hww"))
+#hist_SM.Add(file.Get("mutaue_inclus").Get("qqH_hww"))
  
 Lumi_uncert=0.026
 e_eff_uncert=0.02
@@ -206,7 +208,7 @@ hist_ZL.SetFillColor(ROOT.TColor.GetColor("#4496c8"))
 hist_ZL.SetLineColor(1)
 hist_TT.SetFillColor(ROOT.TColor.GetColor("#9999cc"))
 hist_TT.SetLineColor(1)
-hist_SM.SetFillColor(ROOT.TColor.GetColor("#c243cd"))
+#hist_SM.SetFillColor(ROOT.TColor.GetColor("#c243cd"))
 
 hist_sig200.SetLineColor(ROOT.kRed)
 hist_sig300.SetLineColor(ROOT.kBlack)
@@ -219,7 +221,7 @@ hist_sig750.SetLineStyle(2)
 hist_sig900.SetLineColor(ROOT.kBlue)
 hist_sig900.SetLineStyle(2)
 
-hist_SM.SetLineColor(1)
+#hist_SM.SetLineColor(1)
 hist_data.SetLineColor(1)
 
 mystack=ROOT.THStack("mystack","")
@@ -293,7 +295,7 @@ for histo in signal_histos:
 
 #mystack.SetMaximum(1000*mystack.GetMaximum())
 if args.isLog:
-    hist_data.SetMaximum(10000*hist_data.GetMaximum())
+    hist_data.SetMaximum(100000*hist_data.GetMaximum())
 else:
     hist_data.SetMaximum(1.7*hist_data.GetMaximum())
 #errorBand.SetMaximum(1000*mystack.GetMaximum())
@@ -336,17 +338,17 @@ l1=add_lumi()
 l1.Draw("same")
 l2=add_CMS()
 l2.Draw("same")
-#l3=add_Preliminary()
-#l3.Draw("same")
+l3=add_Preliminary()
+l3.Draw("same")
 
-categ  = ROOT.TPaveText(0.18, 0.705, 0.46, 0.705+0.155, "NDC")
+categ  = ROOT.TPaveText(0.25, 0.92, 0.50, 0.97, "NDC")
 categ.SetBorderSize(   0 )
 categ.SetFillStyle(    0 )
 categ.SetTextAlign(   12 )
-categ.SetTextSize ( 0.05 )
+categ.SetTextSize ( 0.04 )
 categ.SetTextColor(    1 )
 categ.SetTextFont (   42 )
-categ.AddText("#mu#tau_{e}")
+categ.AddText("#mu#tau_{e}, inclusive")
 categ.Draw("same")
 
 c.cd()

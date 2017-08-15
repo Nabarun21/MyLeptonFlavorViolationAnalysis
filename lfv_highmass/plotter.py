@@ -97,6 +97,7 @@ varnames['dphiEMet']='#Delta#phi[e, MET] '
 varnames['dphiMuMet']='#Delta#phi[#mu, MET] '
 varnames['BDT']='BDT Discriminator'
 varnames['dphiemu']='#Delta#phi [e, #mu]'
+varnames['met']='MET [GeV]'
  
 Lumi_uncert=0.026
 e_eff_uncert=0.02
@@ -180,11 +181,11 @@ def add_CMS():
     return lumi
 
 def add_Preliminary():
-    lowX=0.28
-    lowY=0.705
+    lowX=0.17
+    lowY=0.645
     lumi  = ROOT.TPaveText(lowX, lowY+0.05, lowX+0.15, lowY+0.15, "NDC")
     lumi.SetTextFont(52)
-    lumi.SetTextSize(0.08*0.8*0.76)
+    lumi.SetTextSize(0.08*0.8*0.7)
     lumi.SetBorderSize(   0 )
     lumi.SetFillStyle(    0 )
     lumi.SetTextAlign(   12 )
@@ -376,7 +377,7 @@ for cat in categories:
 #    print stack.GetMaximum()
     hists["data_obs"].SetMinimum(0.0)
     if isLog:
-        hists["data_obs"].SetMaximum(hists["data_obs"].GetMaximum()*100)
+        hists["data_obs"].SetMaximum(hists["data_obs"].GetMaximum()*1000)
         hists["data_obs"].SetMinimum(0.01)
     for k in range(1,hists["data_obs"].GetSize()-1):
         s=0.0
@@ -417,25 +418,25 @@ for cat in categories:
     l1.Draw("same")
     l2=add_CMS()
     l2.Draw("same")
-    #l3=add_Preliminary()
-    #l3.Draw("same")
+    l3=add_Preliminary()
+    l3.Draw("same")
     
     pad1.RedrawAxis()
   
-    categ  = ROOT.TPaveText(0.17, 0.655, 0.45, 0.655+0.155, "NDC")   
+    categ  = ROOT.TPaveText(0.24, 0.92, 0.50, 0.97, "NDC")   
 #    categ  = ROOT.TPaveText(0.17, 0.655, 0.45, 0.655+0.155, "NDC")
     categ.SetBorderSize(   0 )
     categ.SetFillStyle(    0 )
     categ.SetTextAlign(   12 )
-    categ.SetTextSize ( 0.06 )
+    categ.SetTextSize ( 0.07 )
     categ.SetTextColor(    1 )
     categ.SetTextFont (   42 )
-    if "lfv" in cat and "_1_" in cat:
+    if "mutaue" in cat and "0" in cat:
         categ.AddText(catMap[channel]+", 0 jet")
-    if "lfv" in cat and "_2_" in cat:
+    if "mutaue" in cat and "1" in cat:
         categ.AddText(catMap[channel]+", 1 jet")
-    if "lfv" in cat and "_3_" in cat:
-        categ.AddText(catMap[channel]+", 2 jets gg")
+    if "mutaue" in cat and "2" in cat:
+        categ.AddText(catMap[channel]+", 2+ jets")
     if "lfv" in cat and "_4_" in cat:
         categ.AddText(catMap[channel]+", 2 jets VBF")
     if "_ch1" in cat:

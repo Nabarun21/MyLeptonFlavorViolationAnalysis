@@ -129,9 +129,9 @@ for var in variable_list:
    histos={}
    for i_cat in range(len(categories)):
       histos[categories[i_cat]]=[]
-      for filename in os.listdir('AnalyzerMuE'+args.analyzer_name+str(args.Lumi)):
+      for filename in os.listdir('Analyzer_MuE_'+args.analyzer_name+str(args.Lumi)):
          if "FAKES" in filename or "ETau" in filename :continue
-         file=ROOT.TFile('AnalyzerMuE'+args.analyzer_name+str(args.Lumi)+'/'+filename)
+         file=ROOT.TFile('Analyzer_MuE_'+args.analyzer_name+str(args.Lumi)+'/'+filename)
          new_title=filename.split('.')[0]
          hist_path="os/"+str(i_cat)+"/selected/nosys/"+var[0]
          histo=file.Get(hist_path)

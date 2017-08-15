@@ -1,4 +1,4 @@
-B1;2cimport array
+import array
 import os 
 from sys import argv, stdout, stderr
 import ROOT
@@ -53,8 +53,6 @@ args = parser.parse_args()
 
 
 
-number_of_categories=4
-
 categories=['0','1','2']   #category names in analyzer                                                                                    
 
 syst_names=[]      #sysfolder names in analyzer                                             
@@ -63,23 +61,23 @@ if args.doSyst:
 
 variables = [
 	('BDT_value', 'BDT_value', 1),
-      ('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', 1),
-      ('mPt', 'p_{T}(mu) (GeV)', 4),
-      ('mEta', 'eta(mu)', 1),
-      ('mPhi', 'phi(mu)', 2),
-      ('ePt', 'p_{T}(e) (GeV)', 4),
-      ('eEta', 'eta(e)', 1),
-      ('ePhi', 'phi(e)', 2),
-      ('em_DeltaPhi', 'emu Deltaphi', 1),
-      ('em_DeltaR', 'emu Delta R', 1),
-      ('h_vismass', 'M_{vis} (GeV)', 1),
-      ('Met', 'MET (GeV)', 1),
-      ('ePFMET_Mt', 'MT-e-MET (GeV)', 4),
-      ('mPFMET_Mt', 'MT-mu-MET (GeV)', 4),
-      ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 1),
-      ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 1),
-      ('jetN_30', 'number of jets (p_{T} > 30 GeV)', 1),
-]
+	('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', 1),
+	('mPt', 'p_{T}(mu) (GeV)', 4),
+	('mEta', 'eta(mu)', 1),
+	('mPhi', 'phi(mu)', 2),
+	('ePt', 'p_{T}(e) (GeV)', 4),
+	('eEta', 'eta(e)', 1),
+	('ePhi', 'phi(e)', 2),
+	('em_DeltaPhi', 'emu Deltaphi', 1),
+	('em_DeltaR', 'emu Delta R', 1),
+	('h_vismass', 'M_{vis} (GeV)', 1),
+	('Met', 'MET (GeV)', 1),
+	('ePFMET_Mt', 'MT-e-MET (GeV)', 4),
+	('mPFMET_Mt', 'MT-mu-MET (GeV)', 4),
+	('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 1),
+	('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 1),
+	('jetN_30', 'number of jets (p_{T} > 30 GeV)', 1),
+	]
 
 
 
@@ -107,7 +105,7 @@ commonvars=[
 regions=['ss']
 regions_common=['ss']
 
-Analyzer="AnalyzerMuE"+args.analyzer_name
+Analyzer="Analyzer_MuE_"+args.analyzer_name
 
 
 class GetQCD(object):
@@ -119,7 +117,7 @@ class GetQCD(object):
 	        for var in variables:
 	        	for sign in regions:#,'antiIsolatedweightedmuonelectron/ss','antiIsolatedweightedelectron/ss','antiIsolatedweightedmuon/ss']:
 	        		for j in ['presel','fullsel']:
-	        			for i in range(number_of_categories):
+	        			for i in range(len(categories)):
 	        				x=0
 	        				y=0
 	        				if j=='presel':
@@ -137,6 +135,7 @@ class GetQCD(object):
 	        					file=ROOT.TFile(Analyzer+str(args.Lumi)+"/"+filename)
 							histo=file.Get(hist_path)
 							if not histo:
+								print hist_path,"  ",file
 								continue
 #							print hist_path,"   ",filename,"   ",var[0],"  ",histo.Integral()
 	        					if "data"  not in filename and "FAKES" not in filename and "LFV" not in filename and "QCD" not in filename:

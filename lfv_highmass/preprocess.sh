@@ -32,15 +32,15 @@ echo Current Jobid is: $jobid
 echo Type of Analyzer: $analtype
 
 #remove earlier preprocessed files with analyzer of same name
-rm -r LFVHEMuAnalyzerMVA$analyzer$luminosity*
+rm -r Analyzer_MuE_$analyzer$luminosity*
 
 
 #copy results into current directory in the form wanted
-cp -r results/$jobid/LFVHEMuAnalyzerMVA$analyzer LFVHEMuAnalyzerMVA$analyzer$luminosity
+cp -r results/$jobid/Analyzer_MuE_$analyzer Analyzer_MuE_$analyzer$luminosity
 
 #combine relevant backgrounds
-cp combine_backgrounds.sh LFVHEMuAnalyzerMVA$analyzer$luminosity
-cd LFVHEMuAnalyzerMVA$analyzer$luminosity
+cp combine_backgrounds.sh Analyzer_MuE_$analyzer$luminosity
+cd Analyzer_MuE_$analyzer$luminosity
 source combine_backgrounds.sh
 rm combine_backgrounds.sh
 cd -
@@ -51,7 +51,15 @@ python computeQCD.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType
 
 
 #folder for plotting
-mv QCD$analyzer.root LFVHEMuAnalyzerMVA$analyzer$luminosity'plot'/QCD.root
+mv QCD$analyzer.root Analyzer_MuE_$analyzer$luminosity/QCD.root
 
-#final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting .
-do_lumiweight_inclusive.py
+#final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . INCLUSIVE
+python do_lumiweight_inclusive.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  
+
+
+#final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . PRESEL_CATEGORY_WISE
+python do_lumiweight_presel.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  
+
+
+#final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . FINAL_SEL_CATEGORY_WISE
+python do_lumiweight_sel.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  
