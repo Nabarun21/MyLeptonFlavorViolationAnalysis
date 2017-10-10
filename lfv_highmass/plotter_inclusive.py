@@ -13,11 +13,25 @@ parser.add_argument(
     action="store_true",
     help="Plot Log Y? ")
 parser.add_argument(
+    "--is_TT_DD",
+    type=int,
+    action="store",
+    dest="is_TT_DD",
+    default=0,
+    help="is TTbar data driven")
+parser.add_argument(
     "--channel",
     action="store",
     dest="channel",
     default="me",
     help="Which channel to run over? (et, mt, em, me)")
+parser.add_argument(
+    "--region",
+    type=str,
+    action="store",
+    dest="region",
+    default="os",
+    help="region of space: oppositesign-os,samesign-ss,anti-isolated os/ss etc")
 parser.add_argument(
     "--var",
     type=str,
@@ -33,18 +47,18 @@ parser.add_argument(
     default=35847,
     help="Which channel to run over? (et, mt, em, me)")
 parser.add_argument(
-    "--direc",
+    "--analyzer",
     type=str,
     action="store",
-    dest="direc",
+    dest="analyzer",
     default="highmass",
-    help="name of subfolder in plots directory to save plots")
+    help="name of subfolder in plots analyzertory to save plots")
 parser.add_argument(
     "--prefix",
     action="store",
     dest="prefix",
     default="",
-    help="Provide prefix for TDirectory holding histograms such as 'prefit_' or postfin_'.  Default is '' and will search in CHANNEL_0jet, CHANNEL_boosted, CHANNEL_VBF")
+    help="Provide prefix for TAnalyzertory holding histograms such as 'prefit_' or postfin_'.  Default is '' and will search in CHANNEL_0jet, CHANNEL_boosted, CHANNEL_VBF")
 parser.add_argument(
     "--higgsSF",
     type=int,
@@ -66,18 +80,23 @@ varnames['colmass']='M_{col} [GeV]'
 varnames['vismass']='Visible Mass [GeV]'
 varnames['mtMuMet']='M_{T}[#mu, MET] [GeV]'
 varnames['mtEMet']='M_{T}[e, MET] [GeV]'
-varnames['dphiEMet']='#Delta#phi[e, MET] '
-varnames['dphiMuMet']='#Delta#phi[#mu, MET] '
+varnames['dphiEMet']='|#Delta#phi[e, MET]| '
+varnames['dphiMuMet']='|#Delta#phi[#mu, MET]| '
 varnames['BDT']='BDT Discriminator'
-varnames['dphiemu']='#Delta#phi [e, #mu]'
+varnames['dphiemu']='|#Delta#phi [e, #mu]|'
 varnames['met']='MET [GeV]'
+varnames['meta']='#mu #eta'
+varnames['eeta']='e #eta'
 
-direc=args.direc
+analyzer=args.analyzer
 variable=args.variable
 channel = args.channel
 higgsSF = args.higgsSF
-fileName = args.inputFile
+fileName = "preprocessed_inputs/"+args.analyzer+str(args.Lumi)+"/inclusive/"+args.inputFile
 Lumi=args.Lumi
+
+
+
 file = ROOT.TFile( fileName, "r" )
 
 # Category map for the LaTeX naming of histograms
@@ -164,9 +183,12 @@ trans=ROOT.TColor(new_idx, adapt.GetRed(), adapt.GetGreen(),adapt.GetBlue(), "",
 
 hist_ZTT=file.Get("mutaue_inclus").Get("ZTauTau")
 hist_Fakes=file.Get("mutaue_inclus").Get("QCD")
-hist_Fakes.Add(file.Get("mutaue_inclus").Get("W"))
-
-hist_TT=file.Get("mutaue_inclus").Get("TT")
+#hist_Fakes.Add(file.Get("mutaue_inclus").Get("W"))
+hist_W=file.Get("mutaue_inclus").Get("W")
+if args.is_TT_DD==0:
+    hist_TT=file.Get("mutaue_inclus").Get("TT")
+else:
+    hist_TT=file.Get("mutaue_inclus").Get("TT_DD")
 hist_TT.Add(file.Get("mutaue_inclus").Get("T"))
 hist_sig200=file.Get("mutaue_inclus").Get("LFV200")
 hist_sig300=file.Get("mutaue_inclus").Get("LFV300")
@@ -194,14 +216,18 @@ for k in range(1,hist_ZTT.GetSize()-1):
    hist_TT.SetBinError(k,(squared_sum_others*hist_TT.GetBinContent(k)*hist_TT.GetBinContent(k)+0.10*hist_TT.GetBinContent(k)*0.10*hist_TT.GetBinContent(k)+hist_TT.GetBinError(k)*hist_TT.GetBinError(k))**0.5)
    hist_ZTT.SetBinError(k,(squared_sum_others*hist_ZTT.GetBinContent(k)*hist_ZTT.GetBinContent(k)+0.10*hist_ZTT.GetBinContent(k)*0.10*hist_ZTT.GetBinContent(k)+hist_ZTT.GetBinError(k)*hist_ZTT.GetBinError(k))**0.5)
    hist_ZL.SetBinError(k,(squared_sum_others*hist_ZL.GetBinContent(k)*hist_ZL.GetBinContent(k)+0.12*hist_ZL.GetBinContent(k)*0.12*hist_ZL.GetBinContent(k)+hist_ZL.GetBinError(k)*hist_ZL.GetBinError(k))**0.5)
-   hist_Fakes.SetBinError(k,(squared_sum_others*hist_Fakes.GetBinContent(k)*hist_Fakes.GetBinContent(k)+0.30*hist_Fakes.GetBinContent(k)*0.30*hist_Fakes.GetBinContent(k)+hist_Fakes.GetBinError(k)*hist_Fakes.GetBinError(k))**0.5)
    hist_VV.SetBinError(k,(squared_sum_others*hist_VV.GetBinContent(k)*hist_VV.GetBinContent(k)+0.05*hist_VV.GetBinContent(k)*0.05*hist_VV.GetBinContent(k)+hist_VV.GetBinError(k)*hist_VV.GetBinError(k))**0.5)
-#   hist_SM.SetBinError(k,(squared_sum_others*hist_SM+0.10*hist_SM.GetBinContent(k)*0.10*hist_SM.GetBinContent(k)+hist_SM.GetBinError(k)*hist_SM.GetBinError(k))**0.5)
+   hist_Fakes.SetBinError(k,(squared_sum_others*hist_Fakes.GetBinContent(k)*hist_Fakes.GetBinContent(k)+0.30*hist_Fakes.GetBinContent(k)*0.30*hist_Fakes.GetBinContent(k)+hist_Fakes.GetBinError(k)*hist_Fakes.GetBinError(k))**0.5)
+   hist_W.SetBinError(k,(squared_sum_others*hist_W.GetBinContent(k)*hist_W.GetBinContent(k)+0.1*hist_W.GetBinContent(k)*0.1*hist_W.GetBinContent(k)+hist_W.GetBinError(k)*hist_W.GetBinError(k))**0.5)
+
+#   Hist_SM.SetBinError(k,(squared_sum_others*hist_SM+0.10*hist_SM.GetBinContent(k)*0.10*hist_SM.GetBinContent(k)+hist_SM.GetBinError(k)*hist_SM.GetBinError(k))**0.5)
 
 hist_Fakes.SetFillColor(ROOT.TColor.GetColor("#ffccff"))
 hist_Fakes.SetLineColor(1)
 hist_VV.SetFillColor(ROOT.TColor.GetColor("#12cadd"))
 hist_VV.SetLineColor(1)
+hist_W.SetFillColor(ROOT.TColor.GetColor("#32CD32"))
+hist_W.SetLineColor(1)
 hist_ZTT.SetFillColor(ROOT.TColor.GetColor("#ffcc66"))
 hist_ZTT.SetLineColor(1)
 hist_ZL.SetFillColor(ROOT.TColor.GetColor("#4496c8"))
@@ -226,6 +252,7 @@ hist_data.SetLineColor(1)
 
 mystack=ROOT.THStack("mystack","")
 mystack.Add(hist_Fakes)
+mystack.Add(hist_W)
 #mystack.Add(hist_SM)
 mystack.Add(hist_VV)
 mystack.Add(hist_TT)
@@ -235,6 +262,7 @@ mystack.Add(hist_ZTT)
 errorBand=hist_Fakes.Clone()
 #errorBand.Add(hist_SM)
 errorBand.Add(hist_VV)
+errorBand.Add(hist_W)
 errorBand.Add(hist_TT)
 errorBand.Add(hist_ZL)
 errorBand.Add(hist_ZTT)
@@ -282,6 +310,7 @@ c.SetFrameLineStyle(0)
 c.SetFrameLineWidth(3)
 c.SetFrameBorderMode(0)
 c.SetFrameBorderSize(10)
+
 for histo in signal_histos:
     for bin in range(histo[0].GetNbinsX()+1):
         bg_count=mystack.GetStack().Last().GetBinContent(bin)
@@ -292,6 +321,13 @@ for histo in signal_histos:
             hist_data.SetBinContent(bin,0)
             hist_data.SetBinError(bin,0)
 
+#always blind discriminating mass histos after a certain value excpet when plotting CRs 
+start_blinding_at=160 #(GeV)
+if 'mass' in variable and "CR" not in args.analyzer:
+    start_bin=hist_data.FindFixBin(start_blinding_at)
+    for bin in range(start_bin,hist_data.GetNbinsX()+1):
+        hist_data.SetBinContent(bin,0)
+        hist_data.SetBinError(bin,0)
 
 #mystack.SetMaximum(1000*mystack.GetMaximum())
 if args.isLog:
@@ -326,9 +362,10 @@ legend.AddEntry(hist_ZTT, "Z#rightarrow#tau#tau","f")
 legend.AddEntry(hist_ZL, "Z#rightarrowee/#mu#mu","f")
 legend.AddEntry(hist_TT, "t#bar{t},t+jets","f")
 legend.AddEntry(hist_VV, "Diboson","f")
-legend.AddEntry(hist_Fakes, "Reducible","f")
+legend.AddEntry(hist_W, "W Bkgs.","f")
+legend.AddEntry(hist_Fakes, "QCD","f")
 #legend.AddEntry(hist_SM, "SM Higgs","f")
-#if "QCD" in direc or "SR" in direc:
+#if "QCD" in analyzer or "SR" in analyzer:
 for histo in signal_histos:
     legend.AddEntry(histo[0],histo[1],"l")
 legend.AddEntry(errorBand,"Bkg. unc.","f")
@@ -356,12 +393,18 @@ c.cd()
 ROOT.gPad.RedrawAxis()
 
 c.Modified()
-try:
-    os.mkdir("plots/"+direc+str(args.Lumi))
-    os.mkdir("plots/"+direc+str(args.Lumi)+"/inclusive")
-except:
-    pass
+TTbar_DD=""
+if args.is_TT_DD:
+    TTbar_DD="_data_drivenTT"
 
-c.SaveAs("plots/"+direc+str(args.Lumi)+"/inclusive/"+variable.replace("#","")+".pdf")
+if not os.path.exists("plots/"+analyzer+str(args.Lumi)+TTbar_DD):
+    os.mkdir("plots/"+analyzer+str(args.Lumi)+TTbar_DD)
+if not os.path.exists("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/inclusive"):
+    os.mkdir("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/inclusive")
+if not os.path.exists("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/inclusive/"+args.region):
+    os.mkdir("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/inclusive/"+args.region)
+
+
+c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/inclusive/"+args.region+"/"+variable.replace("#","")+".pdf")
 #c.SaveAs("plots/"+ePt.png")
  

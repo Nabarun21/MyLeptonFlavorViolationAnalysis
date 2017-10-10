@@ -49,8 +49,19 @@ parser.add_argument(
     dest="outputdir",
     default="preprocessed_inputs",
     help="Provide the relative path to the target input file")
-
+parser.add_argument(
+    "--categories",
+    type=str,
+    action="store",
+    dest="categories",
+    default="0,1,2",
+    help="category nameis in analyzer")
 args = parser.parse_args()
+
+
+
+
+categories=[cat for cat in args.categories.split(',')]   #category names in analyzer                                                                                    
 
 
 lumidict2={}

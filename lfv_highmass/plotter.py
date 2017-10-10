@@ -24,6 +24,13 @@ parser.add_argument(
     default=0,
     help="Plot Log Y? (Integers 0, false, 1 true)")
 parser.add_argument(
+    "--is_TT_DD",
+    type=int,
+    action="store",
+    dest="is_TT_DD",
+    default=0,
+    help="if TTbar is data driven")
+parser.add_argument(
     "--lumi",
     type=int,
     action="store",
@@ -31,10 +38,10 @@ parser.add_argument(
     default=35847,
     help="Which channel to run over? (et, mt, em, me)")
 parser.add_argument(
-    "--direc",
+    "--analyzer",
     type=str,
     action="store",
-    dest="direc",
+    dest="analyzer",
     default="highmass",
     help="name of subfolder in plots directory to save plots")
 parser.add_argument(
@@ -44,11 +51,11 @@ parser.add_argument(
     default="et",
     help="Which channel to run over? (et, mt, em, me)")
 parser.add_argument(
-    "--prefix",
+    "--suffix",
     action="store",
-    dest="prefix",
-    default="prefit",
-    help="Provide prefix for TDirectory holding histograms such as 'prefit_' or postfin_'.  Default is '' and will search in CHANNEL_0jet, CHANNEL_boosted, CHANNEL_VBF")
+    dest="suffix",
+    default="presel",
+    help="slection region")
 parser.add_argument(
     "--var",
     type=str,
@@ -82,6 +89,13 @@ parser.add_argument(
     dest="blind",
     default=1,
     help="Do you want to force blinding?")
+parser.add_argument(
+    "--numCategories",
+    type=int,
+    action="store",
+    dest="numCategories",
+    default=3,
+    help="Do you want to force blinding?")
 args = parser.parse_args()
 
 
@@ -98,6 +112,9 @@ varnames['dphiMuMet']='#Delta#phi[#mu, MET] '
 varnames['BDT']='BDT Discriminator'
 varnames['dphiemu']='#Delta#phi [e, #mu]'
 varnames['met']='MET [GeV]'
+varnames['meta']='#mu #eta'
+varnames['eeta']='e #eta'
+
  
 Lumi_uncert=0.026
 e_eff_uncert=0.02
@@ -105,15 +122,21 @@ mu_eff_uncert=0.02
 squared_sum_others=Lumi_uncert*Lumi_uncert+e_eff_uncert*e_eff_uncert+mu_eff_uncert*mu_eff_uncert
 
 Lumi=args.Lumi
-direc=args.direc
+analyzer=args.analyzer
 variable=args.variable
 channel = args.channel
 higgsSF = args.higgsSF
 isLog = args.isLog
-prefix = args.prefix
-categories = varCfgPlotter.getCategories( channel, prefix )
-fileName = args.inputFile
+suffix = args.suffix
+categories = varCfgPlotter.getCategories( channel, suffix ,args.numCategories)
+
 forceBlinding=args.blind
+if suffix=='presel':
+    selection_region='preselection'
+else:
+    selection_region='selection'
+
+fileName = "preprocessed_inputs/"+args.analyzer+str(args.Lumi)+"/"+selection_region+"/"+args.inputFile
 
 if fileName == None :
     fileName = varCfgPlotter.getFile( channel )
@@ -253,7 +276,7 @@ trans=ROOT.TColor(new_idx, adapt.GetRed(), adapt.GetGreen(),adapt.GetBlue(), "",
 
 infoMap = varCfgPlotter.getInfoMap( higgsSF, channel,"" )
 print "infomap ",infoMap
-bkgs = varCfgPlotter.getBackgrounds(channel)
+bkgs = varCfgPlotter.getBackgrounds(channel,args.is_TT_DD)
 print "bg  ",bkgs
 signals = varCfgPlotter.getSignals()
 print "sig    ",signals
@@ -261,7 +284,7 @@ higgsSFSM=1
 for cat in categories:
     print "Plotting for:",cat
     
-    # Get list of the keys to hists in our category directory
+    # Get list of the keys to hists in our category analyzertory
     histKeys = get_Keys_Of_Class( file, cat, "TH1F" )
  
     # Get nominal shapes for all processes
@@ -294,7 +317,7 @@ for cat in categories:
         for toAdd in val[0] :
 #	    print toAdd
             if not toAdd in initHists :
-                print toAdd," not in your file: %s, directory, %s" % (file, cat)
+                print toAdd," not in your file: %s, analyzertory, %s" % (file, cat)
                 continue
             hists[ name ].Add( initHists[ toAdd ] )
     
@@ -393,8 +416,18 @@ for cat in categories:
 #        #if (10*s/((b+0.09*b*0.09*b)**0.5) > 0.5):
 
             if (forceBlinding>0 and s/(0.00000001+s+b) > 0.005):
-                hists["data_obs"].SetBinContent(k,100000000)
-                hists["data_obs"].SetBinError(k,100000000)
+                hists["data_obs"].SetBinContent(k,0)#100000000)
+                hists["data_obs"].SetBinError(k,0)#100000000)
+
+
+                
+    start_blinding_at=160#gev
+#   always blind discriminating mass histos after a certain value except when plotting CRs 
+    if 'mass' in variable and 'CR' not in args.analyzer:
+        start_bin=hists["data_obs"].FindFixBin(start_blinding_at)
+        for bin in range(start_bin,hists["data_obs"].GetNbinsX()+1):
+            hists["data_obs"].SetBinContent(bin,0)
+            hists["data_obs"].SetBinError(bin,0)
 
     hists["data_obs"].Draw("ep")
     stack.Draw("histsame")
@@ -410,7 +443,8 @@ for cat in categories:
  
     legend=make_legend()
     for name, val in infoMap.iteritems() :
-        legend.AddEntry(hists[name], val[1], val[2])
+        if name in bkgs or name in signals:
+            legend.AddEntry(hists[name], val[1], val[2])
     legend.AddEntry(errorBand,"Bkg. unc.","f")
     legend.Draw()
     
@@ -431,12 +465,17 @@ for cat in categories:
     categ.SetTextSize ( 0.07 )
     categ.SetTextColor(    1 )
     categ.SetTextFont (   42 )
-    if "mutaue" in cat and "0" in cat:
-        categ.AddText(catMap[channel]+", 0 jet")
-    if "mutaue" in cat and "1" in cat:
-        categ.AddText(catMap[channel]+", 1 jet")
-    if "mutaue" in cat and "2" in cat:
-        categ.AddText(catMap[channel]+", 2+ jets")
+
+    if "mutaue" in cat and "01jet" in cat:
+        categ.AddText(catMap[channel]+", 0_1 jet "+suffix)
+    if "mutaue" in cat and "rest" in cat:
+        categ.AddText(catMap[channel]+", 2+ jets "+suffix)
+    if "mutaue" in cat and "_0jet" in cat:
+        categ.AddText(catMap[channel]+", 0 jet "+suffix)
+    if "mutaue" in cat and "_1jet" in cat:
+        categ.AddText(catMap[channel]+", 1 jet "+suffix)
+    if "mutaue" in cat and "2jet" in cat:
+        categ.AddText(catMap[channel]+", 2+ jets "+suffix)
     if "lfv" in cat and "_4_" in cat:
         categ.AddText(catMap[channel]+", 2 jets VBF")
     if "_ch1" in cat:
@@ -513,29 +552,33 @@ for cat in categories:
     
     ROOT.gPad.RedrawAxis()
     
+    TTbar_DD=""
+    if args.is_TT_DD==1:
+        TTbar_DD="_data_drivenTT"
+
     c.Modified()
     if not os.path.exists( 'plots' ) : os.makedirs( 'plots' )
-    if not os.path.exists("plots/"+direc+str(args.Lumi)):os.makedirs("plots/"+direc+str(args.Lumi))
+    if not os.path.exists("plots/"+analyzer+str(args.Lumi)+TTbar_DD):os.makedirs("plots/"+analyzer+str(args.Lumi)+TTbar_DD)
     
-    if args.prefix=='presel':
-        if not os.path.exists("plots/"+direc+str(args.Lumi)+"/preselection"):os.makedirs("plots/"+direc+str(args.Lumi)+"/preselection")
+    if args.suffix=='presel':
+        if not os.path.exists("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection"):os.makedirs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection")
 
         if isLog:
-            c.SaveAs("plots/"+direc+str(args.Lumi)+"/preselection/"+"log_"+cat+"_"+variable+".pdf")
-    #       c.SaveAs("plots/"+direc+str(args.Lumi)+"/preselection/"+"log_"+cat+"_"+variable+".pdf")
+            c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection/"+"log_"+cat+"_"+variable+".pdf")
+    #       c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection/"+"log_"+cat+"_"+variable+".pdf")
         else:
-            c.SaveAs("plots/"+direc+str(args.Lumi)+"/preselection/"+cat+"_"+variable+".pdf")
-    #       c.SaveAs("plots/"+direc+str(args.Lumi)+"/preselection/"+cat+"_"+variable+".pdf")
+            c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection/"+cat+"_"+variable+".pdf")
+    #       c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection/"+cat+"_"+variable+".pdf")
  
     else:
-        if not os.path.exists("plots/"+direc+str(args.Lumi)+"/selection"):os.makedirs("plots/"+direc+str(args.Lumi)+"/selection")
+        if not os.path.exists("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection"):os.makedirs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection")
 
         if isLog:
-            c.SaveAs("plots/"+direc+str(args.Lumi)+"/selection/"+"log_"+cat+"_"+variable+".pdf")
-    #       c.SaveAs("plots/"+direc+str(args.Lumi)+"/selection/"+"log_"+cat+"_"+variable+".pdf")
+            c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection/"+"log_"+cat+"_"+variable+".pdf")
+    #       c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection/"+"log_"+cat+"_"+variable+".pdf")
         else:
-            c.SaveAs("plots/"+direc+str(args.Lumi)+"/selection/"+cat+"_"+variable+".pdf")
-    #       c.SaveAs("plots/"+direc+str(args.Lumi)+"/selection/"+cat+"_"+variable+".pdf")
+            c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection/"+cat+"_"+variable+".pdf")
+    #       c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection/"+cat+"_"+variable+".pdf")
         
      
     for bkg in bkgs:

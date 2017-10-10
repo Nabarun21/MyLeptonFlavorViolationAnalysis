@@ -49,8 +49,16 @@ parser.add_argument(
     dest="outputdir",
     default="preprocessed_inputs",
     help="Provide the relative path to the target input file")
-
+parser.add_argument(
+    "--numCategories",
+    type=int,
+    action="store",
+    dest="numCategories",
+    default=3,
+    help="category nameis in analyzer")
 args = parser.parse_args()
+
+
 
 
 lumidict2={}
@@ -63,6 +71,7 @@ lumidict['WG']=1.0
 lumidict['W']=1.0
 lumidict['T']=1.0
 lumidict['TT']=1.0
+lumidict['TT_DD']=1.0
 lumidict['WJETSMC']=1.0
 lumidict['DY']=1.0
 lumidict['Zothers']=1.0
@@ -85,6 +94,7 @@ lumidict['QCD']=args.Lumi
 lumidict2['data_obs']=args.Lumi
 lumidict2['Diboson']=1.49334492783e-05
 lumidict2['TT']=1.08709111195e-05
+lumidict2['TT_DD']=1.08709111195e-05
 lumidict2['WJETSMC']=3e-04
 lumidict2['DY']=2.1e-05
 lumidict2['Zothers']=2.1e-05
@@ -117,7 +127,15 @@ variable_list=[
    ('h_vismass', 'M_{vis} (GeV)', col_vis_mass_binning),
    ]
 
-categories=["mutaue_0jet_selected","mutaue_1jet_selected","mutaue_2jet_selected"]
+
+if args.numCategories==3:
+   category_names=["mutaue_0jet_selected","mutaue_1jet_selected","mutaue_2jet_selected"]
+elif args.numCategories==2:
+   category_names=["mutaue_01jet_selected","mutaue_rest_selected"]
+else:
+   print "number of categories must be 1 or 2"
+   exit
+
 
 try:
    os.makedirs(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/selection")
@@ -127,8 +145,8 @@ except Exception as ex:
 
 for var in variable_list:
    histos={}
-   for i_cat in range(len(categories)):
-      histos[categories[i_cat]]=[]
+   for i_cat in range(len(category_names)):
+      histos[category_names[i_cat]]=[]
       for filename in os.listdir('Analyzer_MuE_'+args.analyzer_name+str(args.Lumi)):
          if "FAKES" in filename or "ETau" in filename :continue
          file=ROOT.TFile('Analyzer_MuE_'+args.analyzer_name+str(args.Lumi)+'/'+filename)
@@ -149,7 +167,7 @@ for var in variable_list:
             print "Please fix your binning"
 
 
-         if 'data' not in filename and 'QCD' not in filename:
+         if 'data' not in filename and 'QCD' not in filename and 'TT_DD' not in filename:
             histo.Scale(lumidict['data_obs']/lumidict[new_title])      
          if 'data' in filename:
             histo.SetBinErrorOption(ROOT.TH1.kPoisson)
@@ -175,7 +193,7 @@ for var in variable_list:
          histo.SetTitle(new_title)
          histo.SetName(new_title)
          new_histo=copy.copy(histo)
-         histos[categories[i_cat]].append(new_histo)
+         histos[category_names[i_cat]].append(new_histo)
 
 
    if not histo:

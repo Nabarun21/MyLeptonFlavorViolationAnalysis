@@ -1239,32 +1239,30 @@ class Analyzer_MuE_ttbarCR_1bjet(MegaBase):
                     self.fill_histos(row,sign,None,True,region,btagweight,'presel')
                     folder = sign+'/'+str(int(category))
                     self.fill_histos(row,sign,folder,False,region,btagweight,'presel',qcdshaperegion)
-
-
+                
                 if category == 0 :
-                    if self.my_muon.Pt() < 60: continue 
+                    if self.my_muon.Pt() < 65: continue 
                     if self.my_elec.Pt() < 20: continue
                     if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.5 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.2 : continue
-                    if self.shifted_eMtToPfMet > 50 : continue
+                    if abs(self.shifted_mDPhiToPfMet) < 2.5 : continue
+                    if self.shifted_eMtToPfMet > 200 : continue
                     cut_flow_trk.Fill('jet0sel')
                 
                 if category == 1 :
-                    if self.my_muon.Pt() < 60: continue 
+                    if self.my_muon.Pt() < 65: continue 
                     if self.my_elec.Pt() < 20 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 1.5 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.5 : continue
+                    if abs(self.shifted_mDPhiToPfMet) < 2.0 : continue
+                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.0 : continue
                     if self.shifted_eMtToPfMet > 250 : continue
                     cut_flow_trk.Fill('jet1sel')
                     
                 if category == 2 :
-                    if self.my_muon.Pt() < 60: continue 
+                    if self.my_muon.Pt() < 65: continue 
                     if self.my_elec.Pt() < 20 : continue  #no cut as only electrons with pt>30 are in the ntuples
                     if abs(self.shifted_mDPhiToPfMet) < 1.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.0 : continue
+                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.5 : continue
                     if self.shifted_eMtToPfMet > 250 : continue
                     cut_flow_trk.Fill('jet2tightsel')
-
 
                 folder = sign+'/'+str(int(category))+'/selected/'+sys
                 self.fill_histos(row,sign,folder,False,region,btagweight,sys,qcdshaperegion,self.pileup)
@@ -1364,26 +1362,26 @@ class Analyzer_MuE_ttbarCR_1bjet(MegaBase):
             
                 
                 if category == 0 :
-                    if self.my_muon.Pt() < 60: continue 
+                    if self.my_muon.Pt() < 65: continue 
                     if self.my_elec.Pt() < 20: continue
                     if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.5 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.2 : continue
-                    if self.shifted_eMtToPfMet > 50 : continue
+                    if abs(self.shifted_mDPhiToPfMet) < 2.5 : continue
+                    if self.shifted_eMtToPfMet > 200 : continue
                     cut_flow_trk.Fill('jet0sel')
                 
                 if category == 1 :
-                    if self.my_muon.Pt() < 60: continue 
+                    if self.my_muon.Pt() < 65: continue 
                     if self.my_elec.Pt() < 20 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 1.5 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.5 : continue
+                    if abs(self.shifted_mDPhiToPfMet) < 2.0 : continue
+                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.0 : continue
                     if self.shifted_eMtToPfMet > 250 : continue
                     cut_flow_trk.Fill('jet1sel')
                     
                 if category == 2 :
-                    if self.my_muon.Pt() < 60: continue 
+                    if self.my_muon.Pt() < 65: continue 
                     if self.my_elec.Pt() < 20 : continue  #no cut as only electrons with pt>30 are in the ntuples
                     if abs(self.shifted_mDPhiToPfMet) < 1.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.0 : continue
+                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.5 : continue
                     if self.shifted_eMtToPfMet > 250 : continue
                     cut_flow_trk.Fill('jet2tightsel')
 

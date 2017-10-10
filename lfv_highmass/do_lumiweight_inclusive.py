@@ -23,6 +23,13 @@ parser.add_argument(
     default="cut_based",
     help="type of analyzer: cut_based, BDT, neural_net")
 parser.add_argument(
+    "--region",
+    type=str,
+    action="store",
+    dest="region",
+    default="os",
+    help="region of space: oppositesign-os,samesign-ss,anti-isolated os/ss etc")
+parser.add_argument(
     "--aName",
     type=str,
     action="store",
@@ -63,6 +70,7 @@ lumidict['WG']=1.0
 lumidict['W']=1.0
 lumidict['T']=1.0
 lumidict['TT']=1.0
+lumidict['TT_DD']=1.0
 lumidict['WJETSMC']=1.0
 lumidict['DY']=1.0
 lumidict['Zothers']=1.0
@@ -85,6 +93,7 @@ lumidict['QCD']=args.Lumi
 lumidict2['data_obs']=args.Lumi
 lumidict2['Diboson']=1.49334492783e-05
 lumidict2['TT']=1.08709111195e-05
+lumidict2['TT_DD']=1.08709111195e-05
 lumidict2['WJETSMC']=3e-04
 lumidict2['DY']=2.1e-05
 lumidict2['Zothers']=2.1e-05
@@ -111,6 +120,10 @@ col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(50
 met_vars_binning=array.array('d',(range(0,190,20)+range(200,580,40)+range(600,1010,100)))
 pt_vars_binning=array.array('d',(range(0,190,20)+range(200,500,40)))
 
+col_vis_mass_binning=2
+met_vars_binning=2
+pt_vars_binning=2
+
 variable_list=[
    ('BDT_value', 'BDT_value', 1),
    ('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', col_vis_mass_binning),
@@ -132,6 +145,11 @@ variable_list=[
 
 category="mutaue_inclus"
 
+if not os.path.exists(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/inclusive"):
+   os.makedirs(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/inclusive")
+if not os.path.exists(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/inclusive/"+args.region):
+   os.makedirs(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/inclusive/"+args.region)
+
 for var in variable_list:
    histos={}
    histos[category]=[]
@@ -139,7 +157,7 @@ for var in variable_list:
       if "FAKES" in filename or "ETau" in filename :continue
       file=ROOT.TFile('Analyzer_MuE_'+args.analyzer_name+str(args.Lumi)+'/'+filename)
       new_title=filename.split('.')[0]
-      hist_path="os/"+var[0]
+      hist_path=args.region+"/"+var[0]
       histo=file.Get(hist_path)
         # print histo.GetNbinsX()
       binning=var[2]
@@ -153,7 +171,7 @@ for var in variable_list:
       except:
          print "Please fix your binning"
          
-      if 'data' not in filename and 'QCD' not in filename:
+      if 'data' not in filename and 'QCD' not in filename and 'TT_DD' not in filename:
          histo.Scale(lumidict['data_obs']/lumidict[new_title])      
       if 'data' in filename:
          histo.SetBinErrorOption(ROOT.TH1.kPoisson)
@@ -183,10 +201,6 @@ for var in variable_list:
 
    if not histo:
       continue
-   try:
-         os.makedirs(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/inclusive")
-   except Exception as ex:
-                         print ex
 
    outputfile=ROOT.TFile(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/inclusive/"+var[0]+".root","recreate")
 

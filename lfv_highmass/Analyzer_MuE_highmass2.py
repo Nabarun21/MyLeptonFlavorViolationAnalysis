@@ -15,7 +15,6 @@ from math import sqrt, pi, cos
 #from fakerate_functions import fakerate_central_histogram, fakerate_p1s_histogram, fakerate_m1s_histogram
 import FinalStateAnalysis.TagAndProbe.PileupWeight as PileupWeight
 import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections as MuonPOGCorrections
-import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections_efficiencies as MuonPOGCorrections_efficiencies
 import FinalStateAnalysis.TagAndProbe.EGammaPOGCorrections as EGammaPOGCorrections
 import FinalStateAnalysis.TagAndProbe.HetauCorrection as HetauCorrection
 #import FinalStateAnalysis.TagAndProbe.FakeRate2D as FakeRate2D
@@ -81,7 +80,6 @@ pu_corrector_down = PileupWeight.PileupWeight('MC_Moriond17', *pu_distributions_
 mid_corrector  = MuonPOGCorrections.make_muon_pog_PFMedium_2016ReReco()
 miso_corrector = MuonPOGCorrections.make_muon_pog_TightIso_2016ReReco("Medium")
 trg_corrector  = MuonPOGCorrections.make_muon_pog_IsoMu24oIsoTkMu24_2016ReReco()
-trg_eff_corrector=MuonPOGCorrections_efficiencies.make_muon_pog_IsoMu24oIsoTkMu24_2016ReReco()
 mtrk_corrector = MuonPOGCorrections.mu_trackingEta_MORIOND2017
 #trk_corrector =  MuonPOGCorrections.make_muonptabove10_pog_tracking_corrections_2016()
 #eId_corrector = EGammaPOGCorrections.make_egamma_pog_electronID_ICHEP2016( 'nontrigWP80')
@@ -89,11 +87,11 @@ eId_corrector = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017( 'no
 erecon_corrector=EGammaPOGCorrections.make_egamma_pog_recon_MORIOND17()
 
 
-class Analyzer_MuE_highmass(MegaBase):
+class Analyzer_MuE_highmass2(MegaBase):
     tree = 'em/final/Ntuple'
     def __init__(self, tree, outfile, **kwargs):
         self.channel='EMu'
-        super(Analyzer_MuE_highmass, self).__init__(tree, outfile, **kwargs)
+        super(Analyzer_MuE_highmass2, self).__init__(tree, outfile, **kwargs)
         target = os.path.basename(os.environ['megatarget'])
         self.target=target
 
@@ -335,11 +333,7 @@ class Analyzer_MuE_highmass(MegaBase):
 #        print electron_Eta," ",muon_Eta
         muidcorr = mid_corrector(muon_Pt, abs(muon_Eta))
         muisocorr = miso_corrector(muon_Pt, abs(muon_Eta))
-        if 'LFV' in self.target:
-            mutrcorr=trg_eff_corrector(muon_Pt, abs(muon_Eta))
-        else:
-            mutrcorr = trg_corrector(muon_Pt, abs(muon_Eta))
-        
+        mutrcorr = trg_corrector(muon_Pt, abs(muon_Eta))
         mutrkcorr=mtrk_corrector(muon_Eta)[0]
         eidcorr = eId_corrector(electron_Eta,electron_Pt)
         ereconcorr=erecon_corrector(electron_Eta,electron_Pt)
@@ -391,7 +385,7 @@ class Analyzer_MuE_highmass(MegaBase):
 
 
         sign=[ 'ss','os']
-        jetN = [0,1,2]
+        jetN = [0,1]
         folder=[]
 
 #        alldirs=['','antiIsolatedweighted/','antiIsolated/','antiIsolatedweightedelectron/','antiIsolatedweightedmuon/','antiIsolatedweightedmuonelectron/','fakeRateMethod/']
@@ -1242,11 +1236,11 @@ class Analyzer_MuE_highmass(MegaBase):
                 
                 jn = self.shifted_jetVeto30
                 if jn >= 2:
-                    category=2
+                    category=1
 #                elif jn==2:
  #                   category=2 if self.shifted_vbfMass<550 else 3
                 else:
-                    category=jn
+                    category=0
                 
                 if sys=='nosys':    
 #                    if category!=4:               
@@ -1361,11 +1355,11 @@ class Analyzer_MuE_highmass(MegaBase):
                 self.shifted_vbfMass=getattr(row, jetsys.replace('jes','vbfMass'))
 
                 if jn >= 2:
-                    category=2
+                    category=1
 #                elif jn==2:
  #                   category=2 if self.shifted_vbfMass<550 else 3
                 else:
-                    category=jn
+                    category=0
 
                 self.shifted_type1_pfMetEt=getattr(row, jetsys.replace('jes','type1_pfMet_shiftedPt'))
                 self.shifted_type1_pfMetPhi=getattr(row, jetsys.replace('jes','type1_pfMet_shiftedPhi'))

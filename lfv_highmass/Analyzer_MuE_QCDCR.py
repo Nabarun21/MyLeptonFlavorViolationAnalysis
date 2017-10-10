@@ -15,7 +15,6 @@ from math import sqrt, pi, cos
 #from fakerate_functions import fakerate_central_histogram, fakerate_p1s_histogram, fakerate_m1s_histogram
 import FinalStateAnalysis.TagAndProbe.PileupWeight as PileupWeight
 import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections as MuonPOGCorrections
-import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections_efficiencies as MuonPOGCorrections_efficiencies
 import FinalStateAnalysis.TagAndProbe.EGammaPOGCorrections as EGammaPOGCorrections
 import FinalStateAnalysis.TagAndProbe.HetauCorrection as HetauCorrection
 #import FinalStateAnalysis.TagAndProbe.FakeRate2D as FakeRate2D
@@ -81,7 +80,6 @@ pu_corrector_down = PileupWeight.PileupWeight('MC_Moriond17', *pu_distributions_
 mid_corrector  = MuonPOGCorrections.make_muon_pog_PFMedium_2016ReReco()
 miso_corrector = MuonPOGCorrections.make_muon_pog_TightIso_2016ReReco("Medium")
 trg_corrector  = MuonPOGCorrections.make_muon_pog_IsoMu24oIsoTkMu24_2016ReReco()
-trg_eff_corrector=MuonPOGCorrections_efficiencies.make_muon_pog_IsoMu24oIsoTkMu24_2016ReReco()
 mtrk_corrector = MuonPOGCorrections.mu_trackingEta_MORIOND2017
 #trk_corrector =  MuonPOGCorrections.make_muonptabove10_pog_tracking_corrections_2016()
 #eId_corrector = EGammaPOGCorrections.make_egamma_pog_electronID_ICHEP2016( 'nontrigWP80')
@@ -89,11 +87,11 @@ eId_corrector = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017( 'no
 erecon_corrector=EGammaPOGCorrections.make_egamma_pog_recon_MORIOND17()
 
 
-class Analyzer_MuE_highmass(MegaBase):
+class Analyzer_MuE_QCDCR(MegaBase):
     tree = 'em/final/Ntuple'
     def __init__(self, tree, outfile, **kwargs):
         self.channel='EMu'
-        super(Analyzer_MuE_highmass, self).__init__(tree, outfile, **kwargs)
+        super(Analyzer_MuE_QCDCR, self).__init__(tree, outfile, **kwargs)
         target = os.path.basename(os.environ['megatarget'])
         self.target=target
 
@@ -335,11 +333,7 @@ class Analyzer_MuE_highmass(MegaBase):
 #        print electron_Eta," ",muon_Eta
         muidcorr = mid_corrector(muon_Pt, abs(muon_Eta))
         muisocorr = miso_corrector(muon_Pt, abs(muon_Eta))
-        if 'LFV' in self.target:
-            mutrcorr=trg_eff_corrector(muon_Pt, abs(muon_Eta))
-        else:
-            mutrcorr = trg_corrector(muon_Pt, abs(muon_Eta))
-        
+        mutrcorr = trg_corrector(muon_Pt, abs(muon_Eta))
         mutrkcorr=mtrk_corrector(muon_Eta)[0]
         eidcorr = eId_corrector(electron_Eta,electron_Pt)
         ereconcorr=erecon_corrector(electron_Eta,electron_Pt)
@@ -740,7 +734,7 @@ class Analyzer_MuE_highmass(MegaBase):
                 elif sys=='nosys':
                     histos[folder+'/h_collmass_pfmet'].Fill(collmass(row,row.type1_pfMetEt, row.type1_pfMetPhi),antiIsolatedWeight)
                     """
-        if region!='signal':
+        if 'signal' not in region:
             if region=='eLoosemTight':
                 frarray=self.get_fakerate(row)
                 fakerateWeight=frarray
@@ -833,7 +827,8 @@ class Analyzer_MuE_highmass(MegaBase):
                 elif sys=='udown':
                     histos[fakeRateMethodfolder+'/h_collmass_pfmet'].Fill(collmass(row, row.type1_pfMet_shiftedPt_UnclusteredEnDown, row.type1_pfMet_shiftedPhi_UnclusteredEnDown),fakeRateMethodweight)
                     """
-        if region=='signal' :
+        if 'signal' in region :
+            if region=="signal_sub":weight=weight*(-1)
             for n,d  in enumerate(pudir) :
                 folder = d+f                
                 if sys=='presel':
@@ -1230,15 +1225,15 @@ class Analyzer_MuE_highmass(MegaBase):
  
 
                 if not isMuonTight and not isElecTight: #double fakes, should be tiny
-                    region="eLoosemLoose"
+                    region="signal_sub"
                 elif not isMuonTight and  isElecTight:   # mu fakes, should be small
-                    region="eTightmLoose"
-                elif  isMuonTight and not isElecTight: #e fakes, most fakes should come from here
-                    region="eLoosemTight"
-                elif isMuonTight and isElecTight: #signal region
                     region="signal"
+                elif  isMuonTight and not isElecTight: #e fakes, most fakes should come from here
+                    region="signal"
+                elif isMuonTight and isElecTight: #signal region
+                    region="I am not signal in QCD CR region"
             
-                if region!="signal":continue    
+                if "signal" not in region:continue    
                 
                 jn = self.shifted_jetVeto30
                 if jn >= 2:
@@ -1255,28 +1250,27 @@ class Analyzer_MuE_highmass(MegaBase):
                     self.fill_histos(row,sign,folder,False,region,btagweight,'presel',qcdshaperegion)
 
 
-                
                 if category == 0 :
-                    if self.my_muon.Pt() < 65: continue 
+                    if self.my_muon.Pt() < 60: continue 
                     if self.my_elec.Pt() < 20: continue
                     if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.5 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.5 : continue
-                    if self.shifted_eMtToPfMet > 200 : continue
+                    if abs(self.shifted_mDPhiToPfMet) < 2.2 : continue
+                    if self.shifted_eMtToPfMet > 50 : continue
                     cut_flow_trk.Fill('jet0sel')
                 
                 if category == 1 :
-                    if self.my_muon.Pt() < 65: continue 
+                    if self.my_muon.Pt() < 60: continue 
                     if self.my_elec.Pt() < 20 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.0 : continue
+                    if abs(self.shifted_mDPhiToPfMet) < 1.5 : continue
+                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.5 : continue
                     if self.shifted_eMtToPfMet > 250 : continue
                     cut_flow_trk.Fill('jet1sel')
                     
                 if category == 2 :
-                    if self.my_muon.Pt() < 65: continue 
+                    if self.my_muon.Pt() < 60: continue 
                     if self.my_elec.Pt() < 20 : continue  #no cut as only electrons with pt>30 are in the ntuples
                     if abs(self.shifted_mDPhiToPfMet) < 1.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.5 : continue
+                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.0 : continue
                     if self.shifted_eMtToPfMet > 250 : continue
                     cut_flow_trk.Fill('jet2tightsel')
 
@@ -1345,15 +1339,15 @@ class Analyzer_MuE_highmass(MegaBase):
                 
                 
             if not isMuonTight and not isElecTight: #double fakes, should be tiny
-                region="eLoosemLoose"
+                region="signal_sub"
             elif not isMuonTight and  isElecTight:   # mu fakes, should be small
-                region="eTightmLoose"
-            elif  isMuonTight and not isElecTight: #e fakes, most fakes should come from here
-                region="eLoosemTight"
-            elif isMuonTight and isElecTight: #signal region
                 region="signal"
+            elif  isMuonTight and not isElecTight: #e fakes, most fakes should come from here
+                region="signal"
+            elif isMuonTight and isElecTight: #signal region
+                region="this is QCD CR analyzer"
                 
-            if region!="signal":continue    
+            if "signal" not in region:continue    
 
             for jetsys in self.jetsysdir:
                 self.shifted_jetVeto30=getattr(row, jetsys.replace('jes','jetVeto30'))
@@ -1379,26 +1373,26 @@ class Analyzer_MuE_highmass(MegaBase):
             
                 
                 if category == 0 :
-                    if self.my_muon.Pt() < 65: continue 
+                    if self.my_muon.Pt() < 60: continue 
                     if self.my_elec.Pt() < 20: continue
                     if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.5 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.5 : continue
-                    if self.shifted_eMtToPfMet > 200 : continue
+                    if abs(self.shifted_mDPhiToPfMet) < 2.2 : continue
+                    if self.shifted_eMtToPfMet > 50 : continue
                     cut_flow_trk.Fill('jet0sel')
                 
                 if category == 1 :
-                    if self.my_muon.Pt() < 65: continue 
+                    if self.my_muon.Pt() < 60: continue 
                     if self.my_elec.Pt() < 20 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.0 : continue
+                    if abs(self.shifted_mDPhiToPfMet) < 1.5 : continue
+                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.5 : continue
                     if self.shifted_eMtToPfMet > 250 : continue
                     cut_flow_trk.Fill('jet1sel')
                     
                 if category == 2 :
-                    if self.my_muon.Pt() < 65: continue 
+                    if self.my_muon.Pt() < 60: continue 
                     if self.my_elec.Pt() < 20 : continue  #no cut as only electrons with pt>30 are in the ntuples
                     if abs(self.shifted_mDPhiToPfMet) < 1.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.5 : continue
+                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.0 : continue
                     if self.shifted_eMtToPfMet > 250 : continue
                     cut_flow_trk.Fill('jet2tightsel')
 

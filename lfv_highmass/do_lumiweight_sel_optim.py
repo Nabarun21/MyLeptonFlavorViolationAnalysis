@@ -70,8 +70,8 @@ lumidict['Diboson']=1.0
 lumidict['WG']=1.0
 lumidict['W']=1.0
 lumidict['T']=1.0
-lumidict['TT_DD']=1.0
 lumidict['TT']=1.0
+lumidict['TT_DD']=1.0
 lumidict['WJETSMC']=1.0
 lumidict['DY']=1.0
 lumidict['Zothers']=1.0
@@ -115,43 +115,32 @@ lumidict2['T']=5.23465826064e-06
 lumidict2['QCD']=float(1.0)/float(args.Lumi)
 
 
-
-
 col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,990,50)+range(1000,1520,100)))
-met_vars_binning=array.array('d',(range(0,190,20)+range(200,580,40)+range(600,1010,100)))
-pt_vars_binning=array.array('d',(range(0,190,20)+range(200,500,40)))
+#met_vars_binning=array.array('d',(range(0,190,20)+range(200,580,40)+range(600,1010,100)))
+#pt_vars_binning=array.array('d',(range(0,190,20)+range(200,500,40)))
+
 
 
 variable_list=[
-   ('BDT_value', 'BDT_value', 1),
+#   ('BDT_value', 'BDT_value', 1),
    ('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', col_vis_mass_binning),
-   ('mPt', 'p_{T}(mu) (GeV)', pt_vars_binning),
-   ('mEta', 'eta(mu)', 1),
-   ('mPhi', 'phi(mu)', 2),
-   ('ePt', 'p_{T}(e) (GeV)', pt_vars_binning),
-   ('eEta', 'eta(e)', 1),
-   ('ePhi', 'phi(e)', 2),
-   ('em_DeltaPhi', 'emu Deltaphi', 1),
-   ('em_DeltaR', 'emu Delta R', 1),
-   ('h_vismass', 'M_{vis} (GeV)', col_vis_mass_binning),
-   ('Met', 'MET (GeV)', pt_vars_binning),
-   ('ePFMET_Mt', 'MT-e-MET (GeV)', met_vars_binning),
-   ('mPFMET_Mt', 'MT-mu-MET (GeV)', met_vars_binning),
-   ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 1),
-   ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 1),
+#   ('h_vismass', 'M_{vis} (GeV)', col_vis_mass_binning),
    ]
 
 
-if args.numCategories==3:
-   category_names=["mutaue_0jet_presel","mutaue_1jet_presel","mutaue_2jet_presel"]
-elif args.numCategories==2:
-   category_names=["mutaue_01jet_presel","mutaue_rest_presel"]
+if args.numCategories==2:
+   category_names=["mutaue_0jet_selected","mutaue_1jet_selected"]
+elif args.numCategories==1:
+   category_names=["mutaue_01jet_selected"]
 else:
    print "number of categories must be 1 or 2"
    exit
 
+
 try:
-   os.makedirs(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/preselection")
+   os.makedirs(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/optimizer")
+   os.makedirs(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/optimizer/0")
+   os.makedirs(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/optimizer/1")
 except Exception as ex:
    print ex
 
@@ -159,61 +148,63 @@ except Exception as ex:
 for var in variable_list:
    histos={}
    for i_cat in range(len(category_names)):
-      histos[category_names[i_cat]]=[]
-      for filename in os.listdir('Analyzer_MuE_'+args.analyzer_name+str(args.Lumi)):
-         if "FAKES" in filename or "ETau" in filename :continue
-         file=ROOT.TFile('Analyzer_MuE_'+args.analyzer_name+str(args.Lumi)+'/'+filename)
-         new_title=filename.split('.')[0]
-         hist_path="os/"+str(i_cat)+"/"+var[0]
-         histo=file.Get(hist_path)
+      for cut in cuts[i_cat]:
+         histos[category_names[i_cat]+"_"+cut]=[]
+         for filename in os.listdir('Optimizer_MuE_'+args.analyzer_name+str(args.Lumi)):
+            if "FAKES" in filename or "ETau" in filename :continue
+            file=ROOT.TFile('Optimizer_MuE_'+args.analyzer_name+str(args.Lumi)+'/'+filename)
+            new_title=filename.split('.')[0]
+            hist_path="os/"+str(i_cat)+"/selected/nosys/"+cut+'/'+var[0]
+            histo=file.Get(hist_path)
         # print histo.GetNbinsX()
-         binning=var[2]
 
-         if not histo:
-            continue
-         try:
-            histo.Rebin(binning*2)
-         except TypeError:
-            histo=histo.Rebin(len(binning)-1,"",binning)
-         except:
-            print "Please fix your binning"
+            binning=var[2]
+
+            if not histo:
+               continue
+            try:
+               histo.Rebin(binning*2)
+            except TypeError:
+               histo=histo.Rebin(len(binning)-1,"",binning)
+            except:
+               print "Please fix your binning"
 
 
-         if 'data' not in filename and 'QCD' not in filename and 'TT_DD' not in filename:
-            histo.Scale(lumidict['data_obs']/lumidict[new_title])      
-         if 'data' in filename:
-            histo.SetBinErrorOption(ROOT.TH1.kPoisson)
+            if 'data' not in filename and 'QCD' not in filename and 'TT_DD' not in filename:
+               histo.Scale(lumidict['data_obs']/lumidict[new_title])      
+            if 'data' in filename:
+               histo.SetBinErrorOption(ROOT.TH1.kPoisson)
 
-         lowBound=0
-         highBound=histo.GetNbinsX()
-         for bin in range(1,highBound):
-            if histo.GetBinContent(bin) != 0:
+            lowBound=0
+            highBound=histo.GetNbinsX()
+            for bin in range(1,highBound):
+               if histo.GetBinContent(bin) != 0:
 #            print histo.GetBinContent(bin),bin
-               lowBound = bin
-               break
-         for bin in range(histo.GetNbinsX(),lowBound,-1):
-            if histo.GetBinContent(bin) != 0:
-               highBound = bin
-               break
-         for j in range(lowBound, highBound+1):
-            if lowBound==0:continue
-            if (histo.GetBinContent(j)<=0) and "data" not in filename and "LFV" not in filename:
-               histo.SetBinContent(j,0.001*float((lumidict['data_obs'])*float(lumidict2[new_title])))
-               histo.SetBinError(j,1.8*float((lumidict['data_obs'])*float(lumidict2[new_title])))
+                  lowBound = bin
+                  break
+            for bin in range(histo.GetNbinsX(),lowBound,-1):
+               if histo.GetBinContent(bin) != 0:
+                  highBound = bin
+                  break
+            for j in range(lowBound, highBound+1):
+               if lowBound==0:continue
+               if (histo.GetBinContent(j)<=0) and "data" not in filename and "LFV" not in filename:
+                  histo.SetBinContent(j,0.001*float((lumidict['data_obs'])*float(lumidict2[new_title])))
+                  histo.SetBinError(j,1.8*float((lumidict['data_obs'])*float(lumidict2[new_title])))
              #            print "found neg bin  ",j
 
-         histo.SetTitle(new_title)
-         histo.SetName(new_title)
-         new_histo=copy.copy(histo)
-         histos[category_names[i_cat]].append(new_histo)
+            histo.SetTitle(new_title)
+            histo.SetName(new_title)
+            new_histo=copy.copy(histo)
+            histos[category_names[i_cat]+"_"+cut].append(new_histo)
 
 
-   if not histo:
-      print "couldn't find histo for ",var[0]
-      continue
+            if not histo:
+               print "couldn't find histo for ",var[0]
+               continue
 
    
-   outputfile=ROOT.TFile(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/preselection/"+var[0]+".root","recreate")
+         outputfile=ROOT.TFile(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/optimizer/"+icat+'/'+cut+".root","recreate")
 
 #   print outputfile
    outputfile.cd()

@@ -10,11 +10,11 @@ ROOT.gROOT.SetStyle("Plain")
 ROOT.gErrorIgnoreLevel=ROOT.kError
 
 parser = argparse.ArgumentParser(
-    "Compute QCD from same sign shape and using a OS/SS SF ")
+    "Compute TT from same sign shape and using a OS/SS SF ")
 parser.add_argument(
     "--doSyst",
     action="store_true",
-    help="if set , will calculate QCD histograms for all shape systematics")
+    help="if set , will calculate TT histograms for all shape systematics")
 parser.add_argument(
     "--aType",
     type=str,
@@ -62,7 +62,6 @@ args = parser.parse_args()
 
 categories=[str(cat) for cat in range(args.numCategories)]   #category names in analyzer                                                                                    
 
-
 syst_names=[]      #sysfolder names in analyzer                                             
 if args.doSyst:                                                                                                                                              
 	syst_names=['jetup','jetdown','uup','udown','mesup','mesdown','eesup','eesdown']      #sysfolder names in analyzer                                             
@@ -89,7 +88,7 @@ variables = [
 
 
 
-commonvars=[
+inclusivevars=[
    ('BDT_value', 'BDT_value', 1),
    ('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', 5),
    ('mPt', 'p_{T}(mu) (GeV)', 5),
@@ -110,18 +109,20 @@ commonvars=[
 
 
 
-regions=['ss']
-regions_common=['ss']
+regions=['os']
+regions_inclusive=['os']
 
+#Analyzer="Analyzer_MuE_"+args.analyzer_name
+Analyzer_ttbar="Analyzer_MuE_ttbarCR_1or2bjet"
 Analyzer="Analyzer_MuE_"+args.analyzer_name
-
-
-class GetQCD(object):
+file_TT_SR_MC=ROOT.TFile(Analyzer+str(args.Lumi)+"/TT.root")
+print file_TT_SR_MC
+class GetTT(object):
 	def __init__(self):
 		self.histos={}
                 self.histomc=None
 	        self.histodata=None
-	        self.histoQCD=None
+	        self.histoTT=None
 	        for var in variables:
 	        	for sign in regions:#,'antiIsolatedweightedmuonelectron/ss','antiIsolatedweightedelectron/ss','antiIsolatedweightedmuon/ss']:
 	        		for j in ['presel','fullsel']:
@@ -135,22 +136,28 @@ class GetQCD(object):
 						if j=='fullsel' and 'collmass' not in var[0] and 'vismass' not in var[0]:
 							continue
 						
+						
+						self.histo_TT_SR_MC=file_TT_SR_MC.Get(hist_path)
+						print self.histo_TT_SR_MC
 						self.histomc=None
 						self.histodata=None
-						self.histoQCD=None
-	        				for filename in os.listdir(Analyzer+str(args.Lumi)):
-							if "FAKES" in filename or "QCD" in filename: continue
-	        					file=ROOT.TFile(Analyzer+str(args.Lumi)+"/"+filename)
+						self.histoTT=None
+	        				for filename in os.listdir(Analyzer_ttbar+str(args.Lumi)):
+							if "FAKES" in filename or "TT" in filename: continue
+	        					file=ROOT.TFile(Analyzer_ttbar+str(args.Lumi)+"/"+filename)
+#							histo=file.Get(hist_path.replace("/0/","/1/"))
 							histo=file.Get(hist_path)
 							if not histo:
 								continue
-#							print hist_path,"   ",filename,"   ",var[0],"  ",histo.Integral()
-	        					if "data"  not in filename and "FAKES" not in filename and "LFV" not in filename and "QCD" not in filename:
+							#print hist_path,"   ",filename,"   ",var[0],"  ",histo.Integral()
+	        					if "data"  not in filename and "FAKES" not in filename and "LFV" not in filename and "TT" not in filename:
 								if x==0:
 	        							self.histomc=histo.Clone()
+									if 'QCD' in filename:self.histomc.Scale(1/args.Lumi)
 									self.histomc.SetDirectory(0)
 	        							x+=1
 								else:
+									if "QCD" in filename:self.histomc.Scale(1/args.Lumi)
 	        							self.histomc.Add(histo)
 								
 	        					elif "data" in filename:      		
@@ -163,50 +170,51 @@ class GetQCD(object):
 						if not self.histomc:
 							print "Couldn't find variable ",var[0]
 							continue
-
+						if self.histodata.Integral()==0:
+							continue
+						print var[0]
 						self.histomc.Scale(args.Lumi)				
-#						print "data",self.histodata.Integral()
-#						print "MC",self.histomc.Integral()
-						self.histoQCD=self.histodata.Clone()
-						self.histoQCD.Add(self.histomc,-1)
-						if i==2 or i==3:
-							self.histoQCD.Scale(2.86)
-						else:
-							self.histoQCD.Scale(2.26)
+						print "data",self.histodata.Integral()
+						print "MC",self.histomc.Integral()
+						self.histoTT=self.histodata.Clone()
+						self.histoTT.Add(self.histomc,-1)
+						print "MC SR ",self.histo_TT_SR_MC.Integral()*args.Lumi
+						self.histoTT.Scale((self.histo_TT_SR_MC.Integral()*args.Lumi)/self.histoTT.Integral())
 
-						new_histo=copy.copy(self.histoQCD) #MAKE DEEP COPY 
+						new_histo=copy.copy(self.histoTT) #MAKE DEEP COPY 
 						
 						#replace ss in pathname by os
 						path_name_original=hist_path.split('/')
 						path_name_original_redacted='/'.join(path_name_original[0:(len(path_name_original)-1)])
-						new_path_name=path_name_original_redacted.replace('ss','os',1)
-						self.histos[(new_path_name,var[0])]=new_histo
-	        for var in commonvars:
-	        	for sign in regions_common:
+						self.histos[(path_name_original_redacted,var[0])]=new_histo
+	        for var in inclusivevars:
+	        	for sign in regions_inclusive:
 				x=0
 				y=0
 				hist_path= sign+"/"+var[0]
 #				print hist_path
+				self.histo_TT_SR_MC=file_TT_SR_MC.Get(hist_path)
 				self.histomc=None
 				self.histodata=None
-				self.histoQCD=None
-				for filename in os.listdir(Analyzer+str(args.Lumi)):
-					if "FAKES" in filename or "QCD" in filename: continue
-					file=ROOT.TFile(Analyzer+str(args.Lumi)+"/"+filename)
+				self.histoTT=None
+				for filename in os.listdir(Analyzer_ttbar+str(args.Lumi)):
+					if "FAKES" in filename or "TT" in filename: continue
+					file=ROOT.TFile(Analyzer_ttbar+str(args.Lumi)+"/"+filename)
 					
 					histo=file.Get(hist_path)
+				
 					if not histo:
 						continue
 
-				
-
 #					print hist_path,"   ",filename,"   ",var[0],"  ",histo.Integral()
-					if "data"  not in filename and "FAKES" not in filename and "LFV" not in filename and "QCD" not in filename:
+					if "data"  not in filename and "FAKES" not in filename and "LFV" not in filename and "TT" not in filename:
 						if x==0:
 							self.histomc=histo.Clone()
+							if "QCD" in filename:self.histomc.Scale(1/args.Lumi)
 							self.histomc.SetDirectory(0)
 							x+=1
 						else:
+							if "QCD" in filename:self.histomc.Scale(1/args.Lumi)
 							self.histomc.Add(histo)
 								
 					elif "data" in filename:      		
@@ -222,19 +230,18 @@ class GetQCD(object):
 				self.histomc.Scale(args.Lumi)				
 #						print "data",self.histodata.Integral()
 #						print "MC",self.histomc.Integral()
-				self.histoQCD=self.histodata.Clone()
-				self.histoQCD.Add(self.histomc,-1)
-				self.histoQCD.Scale(2.3)
+				self.histoTT=self.histodata.Clone()
+				self.histoTT.Add(self.histomc,-1)
+				self.histoTT.Scale((self.histo_TT_SR_MC.Integral()*args.Lumi)/self.histoTT.Integral())
 
-				new_histo=copy.copy(self.histoQCD) #MAKE DEEP COPY 
-					#replace ss in pathname by os
+				new_histo=copy.copy(self.histoTT) #MAKE DEEP COPY 
+
 				path_name_original=hist_path.split('/')
 				path_name_original_redacted='/'.join(path_name_original[0:(len(path_name_original)-1)])
-				new_path_name=path_name_original_redacted.replace('ss','os',1)
-				self.histos[(new_path_name,var[0])]=new_histo
+				self.histos[(path_name_original_redacted,var[0])]=new_histo
 
 
-		self.outputfile=ROOT.TFile("QCD"+args.analyzer_name+".root","recreate")
+		self.outputfile=ROOT.TFile("TT_DD_"+args.analyzer_name+".root","recreate")
 		self.outputfile.cd()
 		for key in self.histos.keys():
 			print key
@@ -242,7 +249,7 @@ class GetQCD(object):
 #			self.outputfile.cd()
 			self.dir0 = self.outputfile.mkdir(key[0])
 #			print self.dir0
-			self.dir0.Cd("QCD"+args.analyzer_name+".root:/"+key[0])
+			self.dir0.Cd("TT_DD_"+args.analyzer_name+".root:/"+key[0])
 #    print dir0
 #			print histos[key]
 			self.histos[key].SetDirectory(self.dir0)
@@ -252,4 +259,4 @@ class GetQCD(object):
 
 
 
-QCD=GetQCD()
+TT=GetTT()

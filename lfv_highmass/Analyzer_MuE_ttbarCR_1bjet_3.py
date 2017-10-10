@@ -15,7 +15,6 @@ from math import sqrt, pi, cos
 #from fakerate_functions import fakerate_central_histogram, fakerate_p1s_histogram, fakerate_m1s_histogram
 import FinalStateAnalysis.TagAndProbe.PileupWeight as PileupWeight
 import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections as MuonPOGCorrections
-import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections_efficiencies as MuonPOGCorrections_efficiencies
 import FinalStateAnalysis.TagAndProbe.EGammaPOGCorrections as EGammaPOGCorrections
 import FinalStateAnalysis.TagAndProbe.HetauCorrection as HetauCorrection
 #import FinalStateAnalysis.TagAndProbe.FakeRate2D as FakeRate2D
@@ -81,7 +80,6 @@ pu_corrector_down = PileupWeight.PileupWeight('MC_Moriond17', *pu_distributions_
 mid_corrector  = MuonPOGCorrections.make_muon_pog_PFMedium_2016ReReco()
 miso_corrector = MuonPOGCorrections.make_muon_pog_TightIso_2016ReReco("Medium")
 trg_corrector  = MuonPOGCorrections.make_muon_pog_IsoMu24oIsoTkMu24_2016ReReco()
-trg_eff_corrector=MuonPOGCorrections_efficiencies.make_muon_pog_IsoMu24oIsoTkMu24_2016ReReco()
 mtrk_corrector = MuonPOGCorrections.mu_trackingEta_MORIOND2017
 #trk_corrector =  MuonPOGCorrections.make_muonptabove10_pog_tracking_corrections_2016()
 #eId_corrector = EGammaPOGCorrections.make_egamma_pog_electronID_ICHEP2016( 'nontrigWP80')
@@ -89,11 +87,11 @@ eId_corrector = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017( 'no
 erecon_corrector=EGammaPOGCorrections.make_egamma_pog_recon_MORIOND17()
 
 
-class Analyzer_MuE_highmass(MegaBase):
+class Analyzer_MuE_ttbarCR_1bjet_3(MegaBase):
     tree = 'em/final/Ntuple'
     def __init__(self, tree, outfile, **kwargs):
         self.channel='EMu'
-        super(Analyzer_MuE_highmass, self).__init__(tree, outfile, **kwargs)
+        super(Analyzer_MuE_ttbarCR_1bjet_3, self).__init__(tree, outfile, **kwargs)
         target = os.path.basename(os.environ['megatarget'])
         self.target=target
 
@@ -335,11 +333,7 @@ class Analyzer_MuE_highmass(MegaBase):
 #        print electron_Eta," ",muon_Eta
         muidcorr = mid_corrector(muon_Pt, abs(muon_Eta))
         muisocorr = miso_corrector(muon_Pt, abs(muon_Eta))
-        if 'LFV' in self.target:
-            mutrcorr=trg_eff_corrector(muon_Pt, abs(muon_Eta))
-        else:
-            mutrcorr = trg_corrector(muon_Pt, abs(muon_Eta))
-        
+        mutrcorr = trg_corrector(muon_Pt, abs(muon_Eta))
         mutrkcorr=mtrk_corrector(muon_Eta)[0]
         eidcorr = eId_corrector(electron_Eta,electron_Pt)
         ereconcorr=erecon_corrector(electron_Eta,electron_Pt)
@@ -921,20 +915,14 @@ class Analyzer_MuE_highmass(MegaBase):
 
  
             nbtagged=row.bjetCISVVeto30Medium
-            if nbtagged>2:
-                continue
+
+            if nbtagged!=2:continue
             btagweight=1
-            if (self.isData and nbtagged>0):
-                continue
-            if nbtagged>0:
-                if nbtagged==1:
-                    btagweight=bTagSF.bTagEventWeight(nbtagged,row.jb1pt,row.jb1hadronflavor,row.jb2pt,row.jb2hadronflavor,1,0,0) if (row.jb1pt>-990 and row.jb1hadronflavor>-990) else 0
-                if nbtagged==2:
-                    btagweight=bTagSF.bTagEventWeight(nbtagged,row.jb1pt,row.jb1hadronflavor,row.jb2pt,row.jb2hadronflavor,1,0,0) if (row.jb1pt>-990 and row.jb1hadronflavor>-990 and row.jb2pt>-990 and row.jb2hadronflavor>-990) else 0
-#                print "btagweight,nbtagged,row.jb1pt,row.jb1hadronflavor,row.jb2pt,row.jb2hadronflavor"," ",btagweight," ",nbtagged," ",row.jb1pt," ",row.jb1hadronflavor," ",row.jb2pt," ",row.jb2hadronflavor
 
-#            if btagweight<0:btagweight=0
-
+            if not self.isData:
+               #   btagweight1=bTagSF.bTagEventWeight(nbtagged,row.jb1pt,row.jb1hadronflavor,row.jb2pt,row.jb2hadronflavor,1,0,1) if (row.jb1pt>-990 and row.jb1hadronflavor>-990) else 0
+                  btagweight=bTagSF.bTagEventWeight(nbtagged,row.jb1pt,row.jb1hadronflavor,row.jb2pt,row.jb2hadronflavor,1,0,2) if (row.jb1pt>-990 and row.jb1hadronflavor>-990 and row.jb2pt>-990 and row.jb2hadronflavor>-990) else 0
+#                  btagweight=btagweight1+btagweight2
             if btagweight==0: continue
 
             cut_flow_trk.Fill('bjetveto')
@@ -1241,6 +1229,7 @@ class Analyzer_MuE_highmass(MegaBase):
                 if region!="signal":continue    
                 
                 jn = self.shifted_jetVeto30
+
                 if jn >= 2:
                     category=2
 #                elif jn==2:
@@ -1248,13 +1237,13 @@ class Analyzer_MuE_highmass(MegaBase):
                 else:
                     category=jn
                 
+                if jn>=3:continue
+
                 if sys=='nosys':    
 #                    if category!=4:               
                     self.fill_histos(row,sign,None,True,region,btagweight,'presel')
                     folder = sign+'/'+str(int(category))
                     self.fill_histos(row,sign,folder,False,region,btagweight,'presel',qcdshaperegion)
-
-
                 
                 if category == 0 :
                     if self.my_muon.Pt() < 65: continue 
@@ -1279,7 +1268,6 @@ class Analyzer_MuE_highmass(MegaBase):
                     if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.5 : continue
                     if self.shifted_eMtToPfMet > 250 : continue
                     cut_flow_trk.Fill('jet2tightsel')
-
 
                 folder = sign+'/'+str(int(category))+'/selected/'+sys
                 self.fill_histos(row,sign,folder,False,region,btagweight,sys,qcdshaperegion,self.pileup)
@@ -1366,6 +1354,8 @@ class Analyzer_MuE_highmass(MegaBase):
  #                   category=2 if self.shifted_vbfMass<550 else 3
                 else:
                     category=jn
+
+                if jn>=3:continue
 
                 self.shifted_type1_pfMetEt=getattr(row, jetsys.replace('jes','type1_pfMet_shiftedPt'))
                 self.shifted_type1_pfMetPhi=getattr(row, jetsys.replace('jes','type1_pfMet_shiftedPhi'))
