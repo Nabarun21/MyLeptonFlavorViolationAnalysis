@@ -39,3 +39,4 @@ source make_plots.sh -analyzer analyzer_name -lumi 35847 -analtype cutBased -num
 ```
 
 
+Plots should appear in plots/$analyzer_name$luminosity
