@@ -20,6 +20,7 @@ import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections_efficiencies as MuonPOG
 import FinalStateAnalysis.TagAndProbe.HetauCorrection as HetauCorrection
 #import FinalStateAnalysis.TagAndProbe.FakeRate2D as FakeRate2D
 import bTagSF as bTagSF
+import optimizer as optimizer
 from inspect import currentframe
 
 
@@ -89,11 +90,11 @@ eId_corrector = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017( 'no
 erecon_corrector=EGammaPOGCorrections.make_egamma_pog_recon_MORIOND17()
 
 
-class Analyzer_MuE_highmass2(MegaBase):
+class Optimizer_MuE_highmass7(MegaBase):
     tree = 'em/final/Ntuple'
     def __init__(self, tree, outfile, **kwargs):
         self.channel='EMu'
-        super(Analyzer_MuE_highmass2, self).__init__(tree, outfile, **kwargs)
+        super(Optimizer_MuE_highmass7, self).__init__(tree, outfile, **kwargs)
         target = os.path.basename(os.environ['megatarget'])
         self.target=target
 
@@ -389,21 +390,25 @@ class Analyzer_MuE_highmass2(MegaBase):
     def begin(self):
 
 
-        sign=[ 'ss','os']
-        jetN = [0,1]
+        sign=['ss','os']
+        jetN = [0,1]#,2]
         folder=[]
-
+        cuts={}
+        cuts[0]=optimizer.compute_regions_0jet(100000,100000,100000,-1000000,100000)
+        cuts[1]=optimizer.compute_regions_0jet(100000,100000,100000,-1000000,100000)
 #        alldirs=['','antiIsolatedweighted/','antiIsolated/','antiIsolatedweightedelectron/','antiIsolatedweightedmuon/','antiIsolatedweightedmuonelectron/','fakeRateMethod/']
         alldirs=['']#,'antiIsolatedweighted/','antiIsolated/']#,'qcdshaperegion/']
 #        alldirs=['']
         for d  in alldirs :
             for i in sign:
                 for jn in jetN: 
-                    folder.append(d+i+'/'+str(jn))
+#                    folder.append(d+i+'/'+str(jn))
                     for s in self.sysdir:
-                        folder.append(d+i+'/'+str(jn)+'/selected/'+s)
-                    for jes in self.jetsysdir:
-                        folder.append(d+i+'/'+str(jn)+'/selected/'+jes)
+#                        folder.append(d+i+'/'+str(jn)+'/selected/'+s)
+                        for cut in cuts[jn]:
+                            folder.append(d+i+'/'+str(jn)+'/selected/'+s+'/'+cut)
+#                    for jes in self.jetsysdir:
+#                        folder.append(d+i+'/'+str(jn)+'/selected/'+jes)
    
                             
 
@@ -436,8 +441,8 @@ class Analyzer_MuE_highmass2(MegaBase):
                 self.book(f, "jetN_30", "Number of jets, p_{T}>30", 10, -0.5, 9.5) 
             else:
                 self.book(f, "h_collmass_pfmet",  "h_collmass_pfmet",  300,0,1500)
-                self.book(f, "h_vismass",  "h_vismass",  300, 0, 1500)
-
+#                self.book(f, "h_vismass",  "h_vismass",  300, 0, 1500)
+                """
         for s in sign:
             self.book(s+'/tNoCuts', "CUT_FLOW", "Cut Flow", len(cut_flow_step), 0, len(cut_flow_step))
 
@@ -472,7 +477,7 @@ class Analyzer_MuE_highmass2(MegaBase):
             for i, name in enumerate(cut_flow_step):
                 xaxis.SetBinLabel(i+1, name)
                 self.cut_flow_map[name] = i+0.5
-
+                """
 
     def fill_jet_histos(self,row,sign,region,btagweight):
 
@@ -863,23 +868,23 @@ class Analyzer_MuE_highmass2(MegaBase):
 
                 elif sys=='nosys':
                     histos[folder+'/h_collmass_pfmet'].Fill(collmass(row,self.shifted_type1_pfMetEt,self.shifted_type1_pfMetPhi,self.my_elec,self.my_muon),weight)                     
-                    histos[folder+'/h_vismass'].Fill((self.my_elec+self.my_muon).M(), weight)
+#                    histos[folder+'/h_vismass'].Fill((self.my_elec+self.my_muon).M(), weight)
                 else:
                     histos[folder+'/h_collmass_pfmet'].Fill(collmass(row,self.shifted_type1_pfMetEt,self.shifted_type1_pfMetPhi,self.my_elec,self.my_muon),weight)
-                    histos[folder+'/h_vismass'].Fill((self.my_elec+self.my_muon).M(), weight)
+ #                   histos[folder+'/h_vismass'].Fill((self.my_elec+self.my_muon).M(), weight)
                 
     def process(self):
-        cut_flow_histo = self.cut_flow_histo
-        cut_flow_trk   = cut_flow_tracker(cut_flow_histo)
+        #cut_flow_histo = self.#cut_flow_histo
+        #cut_flow_trk   = #cut_flow_tracker(#cut_flow_histo)
         myevent=()
         frw = []
         curr_event=0
         for row in self.tree:
             sign = 'ss' if row.e_m_SS else 'os'
 
-            cut_flow_trk.new_row(row.run,row.lumi,row.evt)
+            #cut_flow_trk.new_row(row.run,row.lumi,row.evt)
            
-            cut_flow_trk.Fill('allEvents')
+            #cut_flow_trk.Fill('allEvents')
 
             if (self.is_ZTauTau and not row.isZtautau and not self.is_DYlowmass):
                 continue
@@ -905,18 +910,18 @@ class Analyzer_MuE_highmass2(MegaBase):
             if (not bool(row.singleIsoMu24Pass or row.singleIsoTkMu24Pass)) and trigger: 
                 continue   
 
-            cut_flow_trk.Fill('HLTIsoPasstrg')
+            #cut_flow_trk.Fill('HLTIsoPasstrg')
 
             #vetoes and cleaning
             
             if row.muVetoPt5IsoIdVtx :continue
-            cut_flow_trk.Fill('surplus_mu_veto')
+            #cut_flow_trk.Fill('surplus_mu_veto')
 
             if row.eVetoMVAIsoVtx :continue
-            cut_flow_trk.Fill('surplus_e_veto')
+            #cut_flow_trk.Fill('surplus_e_veto')
 
             if row.tauVetoPt20Loose3HitsVtx : continue
-            cut_flow_trk.Fill('surplus_tau_veto')
+            #cut_flow_trk.Fill('surplus_tau_veto')
 
  
             nbtagged=row.bjetCISVVeto30Medium
@@ -936,7 +941,7 @@ class Analyzer_MuE_highmass2(MegaBase):
 
             if btagweight==0: continue
 
-            cut_flow_trk.Fill('bjetveto')
+            #cut_flow_trk.Fill('bjetveto')
             ## All preselection passed
 
 
@@ -1196,35 +1201,35 @@ class Analyzer_MuE_highmass2(MegaBase):
  
             #mu preselection
                 if not selections.muSelection(row,self.my_muon, 'm'): continue
-                cut_flow_trk.Fill('musel')
+                #cut_flow_trk.Fill('musel')
                 if not selections.lepton_id_iso(row, 'm', 'MuIDTight_idiso0p25',dataperiod=self.data_period): continue
-                cut_flow_trk.Fill('mulooseiso')
+                #cut_flow_trk.Fill('mulooseiso')
 
 
             #E Preselection
                 if not selections.eSelection(row,self.my_elec,'e'): continue
-                cut_flow_trk.Fill('esel')
+                #cut_flow_trk.Fill('esel')
 
                 if not selections.lepton_id_iso(row, 'e', 'eid15Loose_etauiso1',eIDwp='WP80'): continue
-                cut_flow_trk.Fill('elooseiso')
+                #cut_flow_trk.Fill('elooseiso')
 
 
            #take care of ecal gap
                 if abs(self.my_elec.Eta()) > 1.4442 and abs(self.my_elec.Eta()) < 1.566 : continue             
             
                 if deltaR(self.my_elec.Phi(),self.my_muon.Phi(),self.my_elec.Eta(),self.my_muon.Eta())<0.3:continue
-                cut_flow_trk.Fill('DR_e_mu')
+                #cut_flow_trk.Fill('DR_e_mu')
 
 
             ## now divide by e-mu isolation regions, looseloose,loosetight,tightloose,tighttight
                 isMuonTight=False
                 if selections.lepton_id_iso(row, 'm', 'MuIDTight_mutauiso0p15',dataperiod=self.data_period):
-                    cut_flow_trk.Fill('muiso')
+                    #cut_flow_trk.Fill('muiso')
                     isMuonTight=True
 
                 isElecTight=False
                 if selections.lepton_id_iso(row, 'e', 'eid15Loose_etauiso0p1',eIDwp='WP80'): 
-                    cut_flow_trk.Fill('eiso')
+                    #cut_flow_trk.Fill('eiso')
                     isElecTight=True
  
 
@@ -1241,171 +1246,35 @@ class Analyzer_MuE_highmass2(MegaBase):
                 
                 jn = self.shifted_jetVeto30
                 if jn >= 2:
-                    category=1
+                    continue
 #                elif jn==2:
  #                   category=2 if self.shifted_vbfMass<550 else 3
                 else:
-                    category=0
+                    category=jn
                 
-                if sys=='nosys':    
+                #if sys=='nosys':    
 #                    if category!=4:               
-                    self.fill_histos(row,sign,None,True,region,btagweight,'presel')
-                    folder = sign+'/'+str(int(category))
-                    self.fill_histos(row,sign,folder,False,region,btagweight,'presel',qcdshaperegion)
+                 #   self.fill_histos(row,sign,None,True,region,btagweight,'presel')
+                 #   folder = sign+'/'+str(int(category))
+                 #   self.fill_histos(row,sign,folder,False,region,btagweight,'presel',qcdshaperegion)
 
-
-                
                 if category == 0 :
-                    if self.my_muon.Pt() < 65: continue 
-                    if self.my_elec.Pt() < 20: continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.5 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.5 : continue
-                    if self.shifted_eMtToPfMet > 200 : continue
-                    cut_flow_trk.Fill('jet0sel')
-                
+                    if abs(self.shifted_eDPhiToPfMet)>0.7:continue
+                    if self.my_muon.Pt()<70:continue
+#                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi())<2.2:continue
+                    passed_cuts=optimizer.compute_regions_0jet(mPt=self.my_muon.Pt(),ePt=self.my_elec.Pt(),dphiEMu=deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()),eDPhiToPfMet=abs(self.shifted_eDPhiToPfMet),mDPhiToPfMet=abs(self.shifted_mDPhiToPfMet))
+
                 if category == 1 :
-                    if self.my_muon.Pt() < 65: continue 
-                    if self.my_elec.Pt() < 20 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.0 : continue
-                    if self.shifted_eMtToPfMet > 250 : continue
-                    cut_flow_trk.Fill('jet1sel')
-                    
-                if category == 2 :
-                    if self.my_muon.Pt() < 65: continue 
-                    if self.my_elec.Pt() < 20 : continue  #no cut as only electrons with pt>30 are in the ntuples
-                    if abs(self.shifted_mDPhiToPfMet) < 1.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.5 : continue
-                    if self.shifted_eMtToPfMet > 250 : continue
-                    cut_flow_trk.Fill('jet2tightsel')
+                    if abs(self.shifted_eDPhiToPfMet)>0.7:continue
+                    if self.my_muon.Pt()<70:continue
+ #                   if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi())<2.2:continue
+                    passed_cuts=optimizer.compute_regions_1jet(mPt=self.my_muon.Pt(),ePt=self.my_elec.Pt(),dphiEMu=deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()),eDPhiToPfMet=abs(self.shifted_eDPhiToPfMet),mDPhiToPfMet=abs(self.shifted_mDPhiToPfMet))
 
-
-                folder = sign+'/'+str(int(category))+'/selected/'+sys
-                self.fill_histos(row,sign,folder,False,region,btagweight,sys,qcdshaperegion,self.pileup)
+                for cut_passed in  passed_cuts:
+                    folder = sign+'/'+str(int(category))+'/selected/'+sys+'/'+cut_passed
+                    self.fill_histos(row,sign,folder,False,region,btagweight,sys,qcdshaperegion,self.pileup)
             
-            self.my_muon=ROOT.TLorentzVector()
-            self.my_muon.SetPtEtaPhiM(row.mPt,row.mEta,row.mPhi,row.mMass)
-                
-            self.my_elec=ROOT.TLorentzVector()
-            self.my_elec.SetPtEtaPhiM(row.ePt,row.eEta,row.ePhi,row.eMass)
-                
-            self.my_MET=ROOT.TLorentzVector()
-            self.my_MET.SetPtEtaPhiM(row.type1_pfMetEt,0,row.type1_pfMetPhi,0)
-
-            self.shifted_jetVeto30=row.jetVeto30
-            self.shifted_mDPhiToPfMet=deltaPhi(self.my_MET.Phi(),self.my_muon.Phi())
-            self.shifted_eDPhiToPfMet=deltaPhi(self.my_MET.Phi(),self.my_elec.Phi())
-            self.shifted_mMtToPfMet=transMass(self.my_muon,self.my_MET)
-            self.shifted_eMtToPfMet=transMass(self.my_elec,self.my_MET)
-            self.shifted_type1_pfMetPhi=self.my_MET.Phi()
-            self.shifted_type1_pfMetEt=self.my_MET.Pt()
-            self.shifted_vbfMass=row.vbfMass
-            self.shifted_vbfDeta=row.vbfDeta
-
-
-            self.pileup='nominal'
-
-           # preselection
-            if not selections.muSelection(row,self.my_muon, 'm'): continue
-            cut_flow_trk.Fill('musel')
-            if not selections.lepton_id_iso(row, 'm', 'MuIDTight_idiso0p25',dataperiod=self.data_period): continue
-            cut_flow_trk.Fill('mulooseiso')
-
-
-           #Preselection
-            if not selections.eSelection(row,self.my_elec,'e'): continue
-            cut_flow_trk.Fill('esel')
-
-            if not selections.lepton_id_iso(row, 'e', 'eid15Loose_etauiso1',eIDwp='WP80'): continue
-            cut_flow_trk.Fill('elooseiso')
-
-           
-
-
-
-
-           #take care of ecal gap
-            if abs(self.my_elec.Eta()) > 1.4442 and abs(self.my_elec.Eta()) < 1.566 : continue             
-           
-            if deltaR(self.my_elec.Phi(),self.my_muon.Phi(),self.my_elec.Eta(),self.my_muon.Eta())<0.3:continue
-            cut_flow_trk.Fill('DR_e_mu')
-
-
-           #take now divide by e-mu isolation regions, looseloose,loosetight,tightloose,tighttight
-            isMuonTight=False
-            if selections.lepton_id_iso(row, 'm', 'MuIDTight_mutauiso0p15',dataperiod=self.data_period):
-                cut_flow_trk.Fill('muiso')
-                isMuonTight=True
-
-            isElecTight=False
-            if selections.lepton_id_iso(row, 'e', 'eid15Loose_etauiso0p1',eIDwp='WP80'): 
-                cut_flow_trk.Fill('eiso')
-                isElecTight=True
-                
-                
-            if not isMuonTight and not isElecTight: #double fakes, should be tiny
-                region="eLoosemLoose"
-            elif not isMuonTight and  isElecTight:   # mu fakes, should be small
-                region="eTightmLoose"
-            elif  isMuonTight and not isElecTight: #e fakes, most fakes should come from here
-                region="eLoosemTight"
-            elif isMuonTight and isElecTight: #signal region
-                region="signal"
-                
-            if region!="signal":continue    
-
-            for jetsys in self.jetsysdir:
-                self.shifted_jetVeto30=getattr(row, jetsys.replace('jes','jetVeto30'))
-                jn = self.shifted_jetVeto30
-                self.shifted_vbfMass=getattr(row, jetsys.replace('jes','vbfMass'))
-
-                if jn >= 2:
-                    category=1
-#                elif jn==2:
- #                   category=2 if self.shifted_vbfMass<550 else 3
-                else:
-                    category=0
-
-                self.shifted_type1_pfMetEt=getattr(row, jetsys.replace('jes','type1_pfMet_shiftedPt'))
-                self.shifted_type1_pfMetPhi=getattr(row, jetsys.replace('jes','type1_pfMet_shiftedPhi'))
-
-                self.my_MET.SetPtEtaPhiM(self.shifted_type1_pfMetEt,0,self.shifted_type1_pfMetPhi,0)
-
-                self.shifted_mDPhiToPfMet=deltaPhi(self.my_MET.Phi(),self.my_muon.Phi())
-                self.shifted_eDPhiToPfMet=deltaPhi(self.my_MET.Phi(),self.my_elec.Phi())
-                self.shifted_mMtToPfMet=transMass(self.my_muon,self.my_MET)
-                self.shifted_eMtToPfMet=transMass(self.my_elec,self.my_MET)
-            
-                
-                if category == 0 :
-                    if self.my_muon.Pt() < 65: continue 
-                    if self.my_elec.Pt() < 20: continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.5 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.5 : continue
-                    if self.shifted_eMtToPfMet > 200 : continue
-                    cut_flow_trk.Fill('jet0sel')
-                
-                if category == 1 :
-                    if self.my_muon.Pt() < 65: continue 
-                    if self.my_elec.Pt() < 20 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.0 : continue
-                    if self.shifted_eMtToPfMet > 250 : continue
-                    cut_flow_trk.Fill('jet1sel')
-                    
-                if category == 2 :
-                    if self.my_muon.Pt() < 65: continue 
-                    if self.my_elec.Pt() < 20 : continue  #no cut as only electrons with pt>30 are in the ntuples
-                    if abs(self.shifted_mDPhiToPfMet) < 1.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.5 : continue
-                    if self.shifted_eMtToPfMet > 250 : continue
-                    cut_flow_trk.Fill('jet2tightsel')
-
-
-                folder = sign+'/'+str(int(category))+'/selected/'+jetsys
-                self.fill_histos(row,sign,folder,False,region,btagweight,jetsys,qcdshaperegion,self.pileup)
-
-        cut_flow_trk.flush()        
+        #cut_flow_trk.flush()        
     def finish(self):
         self.write_histos()
 

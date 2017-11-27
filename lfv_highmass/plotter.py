@@ -64,6 +64,13 @@ parser.add_argument(
     default="colmass",
     help="Which variable")
 parser.add_argument(
+    "--signals",
+    type=str,
+    action="store",
+    dest="signals",
+    default="200,300,450,600,750,900",
+    help="List of signal mass points to be plotted")
+parser.add_argument(
     "--higgsSF",
     type=int,
     action="store",
@@ -278,7 +285,7 @@ infoMap = varCfgPlotter.getInfoMap( higgsSF, channel,"" )
 print "infomap ",infoMap
 bkgs = varCfgPlotter.getBackgrounds(channel,args.is_TT_DD)
 print "bg  ",bkgs
-signals = varCfgPlotter.getSignals()
+signals = varCfgPlotter.getSignals(args.signals)
 print "sig    ",signals
 higgsSFSM=1
 for cat in categories:

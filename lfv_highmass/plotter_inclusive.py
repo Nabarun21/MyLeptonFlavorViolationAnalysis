@@ -52,7 +52,14 @@ parser.add_argument(
     action="store",
     dest="analyzer",
     default="highmass",
-    help="name of subfolder in plots analyzertory to save plots")
+    help="name of subfolder in plots directory to save plots")
+parser.add_argument(
+    "--signals",
+    type=str,
+    action="store",
+    dest="signals",
+    default="200,300,450,600,750,900",
+    help="name of subfolder in plots directory to save plots")
 parser.add_argument(
     "--prefix",
     action="store",
@@ -183,21 +190,28 @@ trans=ROOT.TColor(new_idx, adapt.GetRed(), adapt.GetGreen(),adapt.GetBlue(), "",
 
 hist_ZTT=file.Get("mutaue_inclus").Get("ZTauTau")
 hist_Fakes=file.Get("mutaue_inclus").Get("QCD")
-#hist_Fakes.Add(file.Get("mutaue_inclus").Get("W"))
-hist_W=file.Get("mutaue_inclus").Get("W")
+hist_Fakes.Add(file.Get("mutaue_inclus").Get("W"))
+#hist_W=file.Get("mutaue_inclus").Get("W")
 if args.is_TT_DD==0:
     hist_TT=file.Get("mutaue_inclus").Get("TT")
 else:
     hist_TT=file.Get("mutaue_inclus").Get("TT_DD")
 hist_TT.Add(file.Get("mutaue_inclus").Get("T"))
-hist_sig200=file.Get("mutaue_inclus").Get("LFV200")
-hist_sig300=file.Get("mutaue_inclus").Get("LFV300")
-hist_sig450=file.Get("mutaue_inclus").Get("LFV450")
-hist_sig600=file.Get("mutaue_inclus").Get("LFV600")
-hist_sig750=file.Get("mutaue_inclus").Get("LFV750")
-hist_sig900=file.Get("mutaue_inclus").Get("LFV900")
+#hist_sig200=file.Get("mutaue_inclus").Get("LFV200")
+#hist_sig300=file.Get("mutaue_inclus").Get("LFV300")
+#hist_sig450=file.Get("mutaue_inclus").Get("LFV450")
+#hist_sig600=file.Get("mutaue_inclus").Get("LFV600")
+#hist_sig750=file.Get("mutaue_inclus").Get("LFV750")
+#hist_sig900=file.Get("mutaue_inclus").Get("LFV900")
 
-signal_histos=[(hist_sig200,"LFV200"), (hist_sig300,"LFV300"), (hist_sig450,"LFV450"), (hist_sig600,"LFV600"), (hist_sig750,"LFV750"), (hist_sig900,"LFV900")]
+signals=args.signals.split(",")
+signals.sort()
+signal_histos=[]
+for signal in signals:
+#    sig_hist=file.Get("mutaue_inclus").Get("LFV"+signal)
+    signal_histos.append((file.Get("mutaue_inclus").Get("LFV"+signal),"LFV"+signal))
+
+#signal_histos=[(hist_sig200,"LFV200"), (hist_sig300,"LFV300"), (hist_sig450,"LFV450"), (hist_sig600,"LFV600"), (hist_sig750,"LFV750"), (hist_sig900,"LFV900")]
 
 hist_VV=file.Get("mutaue_inclus").Get("Diboson")
 hist_data=file.Get("mutaue_inclus").Get("data_obs")
@@ -218,7 +232,7 @@ for k in range(1,hist_ZTT.GetSize()-1):
    hist_ZL.SetBinError(k,(squared_sum_others*hist_ZL.GetBinContent(k)*hist_ZL.GetBinContent(k)+0.12*hist_ZL.GetBinContent(k)*0.12*hist_ZL.GetBinContent(k)+hist_ZL.GetBinError(k)*hist_ZL.GetBinError(k))**0.5)
    hist_VV.SetBinError(k,(squared_sum_others*hist_VV.GetBinContent(k)*hist_VV.GetBinContent(k)+0.05*hist_VV.GetBinContent(k)*0.05*hist_VV.GetBinContent(k)+hist_VV.GetBinError(k)*hist_VV.GetBinError(k))**0.5)
    hist_Fakes.SetBinError(k,(squared_sum_others*hist_Fakes.GetBinContent(k)*hist_Fakes.GetBinContent(k)+0.30*hist_Fakes.GetBinContent(k)*0.30*hist_Fakes.GetBinContent(k)+hist_Fakes.GetBinError(k)*hist_Fakes.GetBinError(k))**0.5)
-   hist_W.SetBinError(k,(squared_sum_others*hist_W.GetBinContent(k)*hist_W.GetBinContent(k)+0.1*hist_W.GetBinContent(k)*0.1*hist_W.GetBinContent(k)+hist_W.GetBinError(k)*hist_W.GetBinError(k))**0.5)
+ #  hist_W.SetBinError(k,(squared_sum_others*hist_W.GetBinContent(k)*hist_W.GetBinContent(k)+0.1*hist_W.GetBinContent(k)*0.1*hist_W.GetBinContent(k)+hist_W.GetBinError(k)*hist_W.GetBinError(k))**0.5)
 
 #   Hist_SM.SetBinError(k,(squared_sum_others*hist_SM+0.10*hist_SM.GetBinContent(k)*0.10*hist_SM.GetBinContent(k)+hist_SM.GetBinError(k)*hist_SM.GetBinError(k))**0.5)
 
@@ -226,8 +240,8 @@ hist_Fakes.SetFillColor(ROOT.TColor.GetColor("#ffccff"))
 hist_Fakes.SetLineColor(1)
 hist_VV.SetFillColor(ROOT.TColor.GetColor("#12cadd"))
 hist_VV.SetLineColor(1)
-hist_W.SetFillColor(ROOT.TColor.GetColor("#32CD32"))
-hist_W.SetLineColor(1)
+#hist_W.SetFillColor(ROOT.TColor.GetColor("#32CD32"))
+#hist_W.SetLineColor(1)
 hist_ZTT.SetFillColor(ROOT.TColor.GetColor("#ffcc66"))
 hist_ZTT.SetLineColor(1)
 hist_ZL.SetFillColor(ROOT.TColor.GetColor("#4496c8"))
@@ -236,25 +250,29 @@ hist_TT.SetFillColor(ROOT.TColor.GetColor("#9999cc"))
 hist_TT.SetLineColor(1)
 #hist_SM.SetFillColor(ROOT.TColor.GetColor("#c243cd"))
 
-hist_sig200.SetLineColor(ROOT.kRed)
-hist_sig300.SetLineColor(ROOT.kBlack)
-hist_sig450.SetLineColor(ROOT.kBlue)
-
-hist_sig600.SetLineColor(ROOT.kRed)
-hist_sig600.SetLineStyle(2)
-hist_sig750.SetLineColor(ROOT.kBlack)
-hist_sig750.SetLineStyle(2)
-hist_sig900.SetLineColor(ROOT.kBlue)
-hist_sig900.SetLineStyle(2)
-
+if len(signal_histos)>1:
+    try:
+        signal_histos[0][0].SetLineColor(ROOT.kRed)
+        signal_histos[1][0].SetLineColor(ROOT.kBlack)
+        signal_histos[2][0].SetLineColor(ROOT.kBlue)
+    
+        signal_histos[3][0].SetLineColor(ROOT.kRed)
+        signal_histos[3][0].SetLineStyle(2)
+        signal_histos[4][0].SetLineColor(ROOT.kBlack)
+        signal_histos[4][0].SetLineStyle(2)
+        signal_histos[5][0].SetLineColor(ROOT.kBlue)
+        signal_histos[5][0].SetLineStyle(2)
+    except IndexError:
+        print "No more signals"
 #hist_SM.SetLineColor(1)
 hist_data.SetLineColor(1)
 
 mystack=ROOT.THStack("mystack","")
-mystack.Add(hist_Fakes)
-mystack.Add(hist_W)
+
+#mystack.Add(hist_W)
 #mystack.Add(hist_SM)
 mystack.Add(hist_VV)
+mystack.Add(hist_Fakes)
 mystack.Add(hist_TT)
 mystack.Add(hist_ZL)
 mystack.Add(hist_ZTT)
@@ -262,7 +280,7 @@ mystack.Add(hist_ZTT)
 errorBand=hist_Fakes.Clone()
 #errorBand.Add(hist_SM)
 errorBand.Add(hist_VV)
-errorBand.Add(hist_W)
+#errorBand.Add(hist_W)
 errorBand.Add(hist_TT)
 errorBand.Add(hist_ZL)
 errorBand.Add(hist_ZTT)
@@ -362,8 +380,8 @@ legend.AddEntry(hist_ZTT, "Z#rightarrow#tau#tau","f")
 legend.AddEntry(hist_ZL, "Z#rightarrowee/#mu#mu","f")
 legend.AddEntry(hist_TT, "t#bar{t},t+jets","f")
 legend.AddEntry(hist_VV, "Diboson","f")
-legend.AddEntry(hist_W, "W Bkgs.","f")
-legend.AddEntry(hist_Fakes, "QCD","f")
+#legend.AddEntry(hist_W, "W Bkgs.","f")
+legend.AddEntry(hist_Fakes, "W/QCD","f")
 #legend.AddEntry(hist_SM, "SM Higgs","f")
 #if "QCD" in analyzer or "SR" in analyzer:
 for histo in signal_histos:

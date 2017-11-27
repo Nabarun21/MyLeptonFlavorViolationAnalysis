@@ -15,8 +15,8 @@ from math import sqrt, pi, cos
 #from fakerate_functions import fakerate_central_histogram, fakerate_p1s_histogram, fakerate_m1s_histogram
 import FinalStateAnalysis.TagAndProbe.PileupWeight as PileupWeight
 import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections as MuonPOGCorrections
-import FinalStateAnalysis.TagAndProbe.EGammaPOGCorrections as EGammaPOGCorrections
 import FinalStateAnalysis.TagAndProbe.MuonPOGCorrections_efficiencies as MuonPOGCorrections_efficiencies
+import FinalStateAnalysis.TagAndProbe.EGammaPOGCorrections as EGammaPOGCorrections
 import FinalStateAnalysis.TagAndProbe.HetauCorrection as HetauCorrection
 #import FinalStateAnalysis.TagAndProbe.FakeRate2D as FakeRate2D
 import bTagSF as bTagSF
@@ -89,11 +89,11 @@ eId_corrector = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017( 'no
 erecon_corrector=EGammaPOGCorrections.make_egamma_pog_recon_MORIOND17()
 
 
-class Analyzer_MuE_highmass2(MegaBase):
+class Analyzer_MuE_highmass_optcuts750(MegaBase):
     tree = 'em/final/Ntuple'
     def __init__(self, tree, outfile, **kwargs):
         self.channel='EMu'
-        super(Analyzer_MuE_highmass2, self).__init__(tree, outfile, **kwargs)
+        super(Analyzer_MuE_highmass_optcuts750, self).__init__(tree, outfile, **kwargs)
         target = os.path.basename(os.environ['megatarget'])
         self.target=target
 
@@ -339,6 +339,7 @@ class Analyzer_MuE_highmass2(MegaBase):
             mutrcorr=trg_eff_corrector(muon_Pt, abs(muon_Eta))
         else:
             mutrcorr = trg_corrector(muon_Pt, abs(muon_Eta))
+        
         mutrkcorr=mtrk_corrector(muon_Eta)[0]
         eidcorr = eId_corrector(electron_Eta,electron_Pt)
         ereconcorr=erecon_corrector(electron_Eta,electron_Pt)
@@ -390,7 +391,7 @@ class Analyzer_MuE_highmass2(MegaBase):
 
 
         sign=[ 'ss','os']
-        jetN = [0,1]
+        jetN = [0,1,2]
         folder=[]
 
 #        alldirs=['','antiIsolatedweighted/','antiIsolated/','antiIsolatedweightedelectron/','antiIsolatedweightedmuon/','antiIsolatedweightedmuonelectron/','fakeRateMethod/']
@@ -1241,11 +1242,11 @@ class Analyzer_MuE_highmass2(MegaBase):
                 
                 jn = self.shifted_jetVeto30
                 if jn >= 2:
-                    category=1
+                    category=2
 #                elif jn==2:
  #                   category=2 if self.shifted_vbfMass<550 else 3
                 else:
-                    category=0
+                    category=jn
                 
                 if sys=='nosys':    
 #                    if category!=4:               
@@ -1253,32 +1254,13 @@ class Analyzer_MuE_highmass2(MegaBase):
                     folder = sign+'/'+str(int(category))
                     self.fill_histos(row,sign,folder,False,region,btagweight,'presel',qcdshaperegion)
 
-
+            
                 
-                if category == 0 :
-                    if self.my_muon.Pt() < 65: continue 
-                    if self.my_elec.Pt() < 20: continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.5 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.5 : continue
-                    if self.shifted_eMtToPfMet > 200 : continue
-                    cut_flow_trk.Fill('jet0sel')
-                
-                if category == 1 :
-                    if self.my_muon.Pt() < 65: continue 
-                    if self.my_elec.Pt() < 20 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.0 : continue
-                    if self.shifted_eMtToPfMet > 250 : continue
-                    cut_flow_trk.Fill('jet1sel')
-                    
-                if category == 2 :
-                    if self.my_muon.Pt() < 65: continue 
-                    if self.my_elec.Pt() < 20 : continue  #no cut as only electrons with pt>30 are in the ntuples
-                    if abs(self.shifted_mDPhiToPfMet) < 1.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.5 : continue
-                    if self.shifted_eMtToPfMet > 250 : continue
-                    cut_flow_trk.Fill('jet2tightsel')
-
+                if self.my_muon.Pt() < 250: continue 
+                if self.my_elec.Pt() < 10: continue
+                if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.2 : continue
+                if abs(self.shifted_eDPhiToPfMet) > 0.7 : continue
+                cut_flow_trk.Fill('jet0sel')
 
                 folder = sign+'/'+str(int(category))+'/selected/'+sys
                 self.fill_histos(row,sign,folder,False,region,btagweight,sys,qcdshaperegion,self.pileup)
@@ -1360,11 +1342,11 @@ class Analyzer_MuE_highmass2(MegaBase):
                 self.shifted_vbfMass=getattr(row, jetsys.replace('jes','vbfMass'))
 
                 if jn >= 2:
-                    category=1
+                    category=2
 #                elif jn==2:
  #                   category=2 if self.shifted_vbfMass<550 else 3
                 else:
-                    category=0
+                    category=jn
 
                 self.shifted_type1_pfMetEt=getattr(row, jetsys.replace('jes','type1_pfMet_shiftedPt'))
                 self.shifted_type1_pfMetPhi=getattr(row, jetsys.replace('jes','type1_pfMet_shiftedPhi'))
@@ -1377,30 +1359,12 @@ class Analyzer_MuE_highmass2(MegaBase):
                 self.shifted_eMtToPfMet=transMass(self.my_elec,self.my_MET)
             
                 
-                if category == 0 :
-                    if self.my_muon.Pt() < 65: continue 
-                    if self.my_elec.Pt() < 20: continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.5 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.5 : continue
-                    if self.shifted_eMtToPfMet > 200 : continue
-                    cut_flow_trk.Fill('jet0sel')
+                if self.my_muon.Pt() < 250: continue 
+                if self.my_elec.Pt() < 10: continue
+                if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.2 : continue
+                if abs(self.shifted_eDPhiToPfMet) > 0.7 : continue
+                cut_flow_trk.Fill('jet0sel')
                 
-                if category == 1 :
-                    if self.my_muon.Pt() < 65: continue 
-                    if self.my_elec.Pt() < 20 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.0 : continue
-                    if self.shifted_eMtToPfMet > 250 : continue
-                    cut_flow_trk.Fill('jet1sel')
-                    
-                if category == 2 :
-                    if self.my_muon.Pt() < 65: continue 
-                    if self.my_elec.Pt() < 20 : continue  #no cut as only electrons with pt>30 are in the ntuples
-                    if abs(self.shifted_mDPhiToPfMet) < 1.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.5 : continue
-                    if self.shifted_eMtToPfMet > 250 : continue
-                    cut_flow_trk.Fill('jet2tightsel')
-
 
                 folder = sign+'/'+str(int(category))+'/selected/'+jetsys
                 self.fill_histos(row,sign,folder,False,region,btagweight,jetsys,qcdshaperegion,self.pileup)

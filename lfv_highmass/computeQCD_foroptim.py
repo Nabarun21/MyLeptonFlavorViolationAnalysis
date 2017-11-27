@@ -60,8 +60,8 @@ args = parser.parse_args()
 
 
 cuts={}
-cuts[0]=optimizer.compute_regions_0jet(100000,100000,100000,-1000000,100000)
-cuts[1]=optimizer.compute_regions_0jet(100000,100000,100000,-1000000,100000)
+cuts[0]=optimizer.compute_regions_0jet(100000,100000,100000,-1000000,100000,10000,-10000)
+cuts[1]=optimizer.compute_regions_0jet(100000,100000,100000,-1000000,100000,10000,-10000)
 
 
 categories=[str(cat) for cat in range(args.numCategories)]   #category names in analyzer                                                                                    

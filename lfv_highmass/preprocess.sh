@@ -57,12 +57,12 @@ mv QCD$analyzer.root Analyzer_MuE_$analyzer$luminosity/QCD.root
 
 
 #compute TTBar from CR data
-if [ "X"${isTT_DD} != "X" ]  
-    then
-    echo computing ttbar from CR data
-    python computeTTbar.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat
-    mv TT_DD_$analyzer.root Analyzer_MuE_$analyzer$luminosity/TT_DD.root #folder for plotting
-fi
+#if [ "X"${isTT_DD} != "X" ]  
+#    then
+#    echo computing ttbar from CR data
+#    python computeTTbar.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat
+#    mv TT_DD_$analyzer.root Analyzer_MuE_$analyzer$luminosity/TT_DD.root #folder for plotting
+#fi
 
 
 

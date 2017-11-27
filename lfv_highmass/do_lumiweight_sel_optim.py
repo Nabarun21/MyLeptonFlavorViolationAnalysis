@@ -5,6 +5,7 @@ import ROOT
 import sys
 import copy
 import argparse
+import optimizer as optimizer
 ROOT.gROOT.SetStyle("Plain")
 #ROOT.gROOT.SetBatch(True)
 #ROOT.gStyle.SetOptStat(0)
@@ -60,6 +61,10 @@ args = parser.parse_args()
 
 
 
+
+cuts={}
+cuts[0]=optimizer.compute_regions_0jet(100000,100000,100000,-1000000,100000,10000,-10000)
+cuts[1]=optimizer.compute_regions_0jet(100000,100000,100000,-1000000,100000,10000,-10000)
 
 lumidict2={}
 lumidict={}
@@ -138,18 +143,18 @@ else:
 
 
 try:
-   os.makedirs(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/optimizer")
-   os.makedirs(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/optimizer/0")
-   os.makedirs(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/optimizer/1")
+   os.makedirs(args.outputdir+"/optimizer/"+args.analyzer_name)
+   os.makedirs(args.outputdir+"/optimizer/"+args.analyzer_name+"/0")
+   os.makedirs(args.outputdir+"/optimizer/"+args.analyzer_name+"/1")
 except Exception as ex:
    print ex
 
 
 for var in variable_list:
-   histos={}
    for i_cat in range(len(category_names)):
       for cut in cuts[i_cat]:
-         histos[category_names[i_cat]+"_"+cut]=[]
+         histos={}
+         histos[category_names[i_cat]]=[]
          for filename in os.listdir('Optimizer_MuE_'+args.analyzer_name+str(args.Lumi)):
             if "FAKES" in filename or "ETau" in filename :continue
             file=ROOT.TFile('Optimizer_MuE_'+args.analyzer_name+str(args.Lumi)+'/'+filename)
@@ -196,7 +201,7 @@ for var in variable_list:
             histo.SetTitle(new_title)
             histo.SetName(new_title)
             new_histo=copy.copy(histo)
-            histos[category_names[i_cat]+"_"+cut].append(new_histo)
+            histos[category_names[i_cat]].append(new_histo)
 
 
             if not histo:
@@ -204,22 +209,22 @@ for var in variable_list:
                continue
 
    
-         outputfile=ROOT.TFile(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/optimizer/"+icat+'/'+cut+".root","recreate")
+         outputfile=ROOT.TFile(args.outputdir+"/optimizer/"+args.analyzer_name+"/"+str(i_cat)+'/'+cut+".root","recreate")
 
 #   print outputfile
-   outputfile.cd()
-   for key in histos.keys():
-      dir0 = outputfile.mkdir(key);
+         outputfile.cd()
+         for key in histos.keys():
+            dir0 = outputfile.mkdir(key);
   # print dir
-      dir0.cd();
+            dir0.cd();
          #   print key
-      for histo in histos[key]:
+            for histo in histos[key]:
  #     if "_" not in histo.GetName():
   #       print histo.GetName()
    #      print histo.GetBinContent(15)
     #     print histo.GetBinError(15)
-         histo.Write()
-   outputfile.Close()
+               histo.Write()
+         outputfile.Close()
 
 
 

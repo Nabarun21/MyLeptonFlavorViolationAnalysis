@@ -33,15 +33,15 @@ def getCategories( channel="et", suffix="",num_categories=3 ) :
         categories[2]="mutau_HMuTau_mutauhad_3_2016_"+suffix
         categories[3]="mutau_HMuTau_mutauhad_4_2016_"+suffix
     if channel=="me":
-        if num_categories==3:
+        if int(num_categories)==3:
             categories[0]="mutaue_0jet_"+suffix
             categories[1]="mutaue_1jet_"+suffix
             categories[2]="mutaue_2jet_"+suffix
-        elif num_categories==2:
+        elif int(num_categories)==2:
             categories[0]="mutaue_01jet_"+suffix
             categories[1]="mutaue_rest_"+suffix
         else:
-            print 'num_categoies needs to be 2 or 3'
+            print 'num_categories needs to be 2 or 3'
             exit
 
 
@@ -76,9 +76,9 @@ def getInfoMap( higgsSF, channel, shift="" ) :
     if channel=="et" or channel=="mt":
        infoMap["QCD"] = [["Fakes",],"Reducible","f","#ffccff"]
     if channel == "me" or channel=="em":
-#       infoMap["QCD"] = [["QCD","W"+shift],"Reducible","f","#ffccff",0.30]
-       infoMap["QCD"] = [["QCD"],"QCD","f","#ffccff",0.30]
-       infoMap["W"] = [["W"+shift],"W Bkgs.","f","#32CD32",0.10]
+       infoMap["QCD"] = [["QCD","W"+shift],"W/QCD","f","#ffccff",0.30]
+#       infoMap["QCD"] = [["QCD"],"QCD","f","#ffccff",0.30]
+#       infoMap["W"] = [["W"+shift],"W Bkgs.","f","#32CD32",0.10]
     if channel=="em" or channel=="et":
        infoMap["H125"] = [["LFVGG125"+shift,"LFVVBF125"+shift,],"H#rightarrowe#tau (B=%i%%)"%higgsSF,"l","#111bbb"]
     elif channel=="me" or channel=="mt":
@@ -94,7 +94,7 @@ def getInfoMap( higgsSF, channel, shift="" ) :
 
 def getBackgrounds(channel,is_TT_DD=None) :
     if channel=="em" or channel=="me":    
-       bkgs=["QCD","W","Diboson", "TT", "ZTT", "ZJ"]
+       bkgs=["Diboson","QCD" ,"TT", "ZTT", "ZJ"] #["QCD","W","Diboson", "TT", "ZTT", "ZJ"]
        if is_TT_DD==1:
            bkgs=["QCD","W","Diboson", "TT_DD", "ZTT", "ZJ"]
        return bkgs
@@ -102,7 +102,10 @@ def getBackgrounds(channel,is_TT_DD=None) :
        bkgs=["QCD", "Diboson", "TT", "ZJ", "ZTT"]
        return bkgs
 
-def getSignals() :
-    signals=["LFV200","LFV300","LFV450","LFV600","LFV750","LFV900"]
-    return signals
+def getSignals(signals) :
+    sig_list=signals.split(",")
+    sig_list.sort()
+    signal_list=["LFV"+mass_value for mass_value in sig_list]
+#    signal_list=["LFV200","LFV300","LFV450","LFV600","LFV750","LFV900"]
+    return signal_list
 

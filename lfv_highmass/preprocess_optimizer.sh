@@ -1,4 +1,4 @@
-B1;95;0c#!/bin/bash                                                                                                                                   
+!/bin/bash                                                                                                                                   
 
 usage='Usage: -a <analyzer name>  -lumi <luminosity in pb> -ns <num_samples> -nf <sampling frequency> -ph <phase position> (-cpt <old pulse type> -cns\
  <old no. of samples> -cnf<old sampling freq>) '

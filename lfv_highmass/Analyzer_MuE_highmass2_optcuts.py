@@ -89,11 +89,11 @@ eId_corrector = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017( 'no
 erecon_corrector=EGammaPOGCorrections.make_egamma_pog_recon_MORIOND17()
 
 
-class Analyzer_MuE_highmass2(MegaBase):
+class Analyzer_MuE_highmass2_optcuts(MegaBase):
     tree = 'em/final/Ntuple'
     def __init__(self, tree, outfile, **kwargs):
         self.channel='EMu'
-        super(Analyzer_MuE_highmass2, self).__init__(tree, outfile, **kwargs)
+        super(Analyzer_MuE_highmass2_optcuts, self).__init__(tree, outfile, **kwargs)
         target = os.path.basename(os.environ['megatarget'])
         self.target=target
 
@@ -1253,32 +1253,13 @@ class Analyzer_MuE_highmass2(MegaBase):
                     folder = sign+'/'+str(int(category))
                     self.fill_histos(row,sign,folder,False,region,btagweight,'presel',qcdshaperegion)
 
-
+            
                 
-                if category == 0 :
-                    if self.my_muon.Pt() < 65: continue 
-                    if self.my_elec.Pt() < 20: continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.5 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.5 : continue
-                    if self.shifted_eMtToPfMet > 200 : continue
-                    cut_flow_trk.Fill('jet0sel')
-                
-                if category == 1 :
-                    if self.my_muon.Pt() < 65: continue 
-                    if self.my_elec.Pt() < 20 : continue
-                    if abs(self.shifted_mDPhiToPfMet) < 2.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.0 : continue
-                    if self.shifted_eMtToPfMet > 250 : continue
-                    cut_flow_trk.Fill('jet1sel')
-                    
-                if category == 2 :
-                    if self.my_muon.Pt() < 65: continue 
-                    if self.my_elec.Pt() < 20 : continue  #no cut as only electrons with pt>30 are in the ntuples
-                    if abs(self.shifted_mDPhiToPfMet) < 1.0 : continue
-                    if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 1.5 : continue
-                    if self.shifted_eMtToPfMet > 250 : continue
-                    cut_flow_trk.Fill('jet2tightsel')
-
+                if self.my_muon.Pt() < 70: continue 
+                if self.my_elec.Pt() < 10: continue
+                if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.2 : continue
+                if abs(self.shifted_eDPhiToPfMet) > 0.7 : continue
+                cut_flow_trk.Fill('jet0sel')
 
                 folder = sign+'/'+str(int(category))+'/selected/'+sys
                 self.fill_histos(row,sign,folder,False,region,btagweight,sys,qcdshaperegion,self.pileup)
