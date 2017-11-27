@@ -5,7 +5,7 @@ Analysis code for Higgs Lepton Flavor Violating decay search (inhertited from UW
 source environment.sh
 cd lfv_highmass
 ```
-To run analyzer, add `analyzer_target` in Rakefile #Analyzer needs to be named Analyzer_{analyzer_name}
+To run analyzer, add `analyzer_target` in Rakefile #Analyzer needs to be named Analyzer_MuE_{analyzer_name}
 
 ```
 ./run.sh -target analyzer_target
