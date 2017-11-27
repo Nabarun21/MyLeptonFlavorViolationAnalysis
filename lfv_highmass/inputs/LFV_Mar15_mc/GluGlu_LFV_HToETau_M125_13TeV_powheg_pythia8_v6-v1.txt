@@ -1,0 +1,6 @@
+LFV_Mar15_mc/GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8_v6-v1/make_ntuples_cfg-2A03345D-F7C0-E611-A5FA-002590FD5A52.root
+LFV_Mar15_mc/GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8_v6-v1/make_ntuples_cfg-2AC7847B-F1C0-E611-8292-002590D9D956.root
+LFV_Mar15_mc/GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8_v6-v1/make_ntuples_cfg-367DCF1F-F5C0-E611-A7A1-00304867FD8F.root
+LFV_Mar15_mc/GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8_v6-v1/make_ntuples_cfg-48B8381C-F7C0-E611-B98C-FA163E13A3CC.root
+LFV_Mar15_mc/GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8_v6-v1/make_ntuples_cfg-70B43113-F7C0-E611-8321-00266CFFC0C0.root
+LFV_Mar15_mc/GluGlu_LFV_HToETau_M125_13TeV_powheg_pythia8_v6-v1/make_ntuples_cfg-EC988211-F7C0-E611-B78E-FA163EC85515.root

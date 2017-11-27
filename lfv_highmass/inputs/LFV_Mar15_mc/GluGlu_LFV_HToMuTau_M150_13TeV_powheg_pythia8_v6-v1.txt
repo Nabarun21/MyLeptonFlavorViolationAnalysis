@@ -1,0 +1,4 @@
+LFV_Mar15_mc/GluGlu_LFV_HToMuTau_M150_13TeV_powheg_pythia8_v6-v1/make_ntuples_cfg-6AF4CE67-8DDB-E611-809B-6CC21739C400.root
+LFV_Mar15_mc/GluGlu_LFV_HToMuTau_M150_13TeV_powheg_pythia8_v6-v1/make_ntuples_cfg-C230CAC8-8DDB-E611-95DB-14DDA9D4F20C.root
+LFV_Mar15_mc/GluGlu_LFV_HToMuTau_M150_13TeV_powheg_pythia8_v6-v1/make_ntuples_cfg-CAB602DF-8DDB-E611-8370-A0369F5BD8D4.root
+LFV_Mar15_mc/GluGlu_LFV_HToMuTau_M150_13TeV_powheg_pythia8_v6-v1/make_ntuples_cfg-D2443C6F-8DDB-E611-82A0-7845C4FC3C80.root
