@@ -55,7 +55,6 @@ python computeQCD.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType
 #folder for plotting
 mv QCD$analyzer.root Analyzer_MuE_$analyzer$luminosity/QCD.root
 
-
 #compute TTBar from CR data
 #if [ "X"${isTT_DD} != "X" ]  
 #    then

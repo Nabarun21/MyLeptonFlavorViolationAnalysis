@@ -104,11 +104,12 @@ lumidict2['qqH_htt']=4.2e-08
 lumidict2['ggH_hww']=2.07e-06
 lumidict2['qqH_hww']=4.2e-08
 lumidict2['LFV200']=1.694e-06
-lumidict2['LFV300']=7.32222222221e-07
-lumidict2['LFV450']=2.70588235294e-07
-lumidict2['LFV600']=1.2625e-07
-lumidict2['LFV750']=9.93800000005e-08 
-lumidict2['LFV900']=4.13076923077e-08 
+lumidict2['LFV300']=1.33345743863e-07 
+lumidict2['LFV450']=4.65541809702e-08
+lumidict2['LFV600']=2.04664734848e-08 
+lumidict2['LFV750']=9.93800000005e-09
+lumidict2['LFV900']=5.37000000001e-09 
+
 lumidict2['WG']=1.56725042226e-06
 lumidict2['W']=1.56725042226e-06
 lumidict2['T']=5.23465826064e-06
@@ -148,7 +149,7 @@ for var in variable_list:
    for i_cat in range(len(category_names)):
       histos[category_names[i_cat]]=[]
       for filename in os.listdir('Analyzer_MuE_'+args.analyzer_name+str(args.Lumi)):
-         if "FAKES" in filename or "ETau" in filename :continue
+         if "FAKES" in filename or "ETau" in filename or "QCD_with_shapes" in filename:continue
          file=ROOT.TFile('Analyzer_MuE_'+args.analyzer_name+str(args.Lumi)+'/'+filename)
          new_title=filename.split('.')[0]
          hist_path="os/"+str(i_cat)+"/selected/nosys/"+var[0]

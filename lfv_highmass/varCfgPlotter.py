@@ -76,9 +76,9 @@ def getInfoMap( higgsSF, channel, shift="" ) :
     if channel=="et" or channel=="mt":
        infoMap["QCD"] = [["Fakes",],"Reducible","f","#ffccff"]
     if channel == "me" or channel=="em":
-       infoMap["QCD"] = [["QCD","W"+shift],"W/QCD","f","#ffccff",0.30]
-#       infoMap["QCD"] = [["QCD"],"QCD","f","#ffccff",0.30]
-#       infoMap["W"] = [["W"+shift],"W Bkgs.","f","#32CD32",0.10]
+#       infoMap["QCD"] = [["QCD","W"+shift],"W/QCD","f","#ffccff",0.30]
+       infoMap["QCD"] = [["QCD"],"QCD","f","#ffccff",0.30]
+       infoMap["W"] = [["W"+shift],"W Bkgs.","f","#32CD32",0.10]
     if channel=="em" or channel=="et":
        infoMap["H125"] = [["LFVGG125"+shift,"LFVVBF125"+shift,],"H#rightarrowe#tau (B=%i%%)"%higgsSF,"l","#111bbb"]
     elif channel=="me" or channel=="mt":
@@ -94,7 +94,7 @@ def getInfoMap( higgsSF, channel, shift="" ) :
 
 def getBackgrounds(channel,is_TT_DD=None) :
     if channel=="em" or channel=="me":    
-       bkgs=["Diboson","QCD" ,"TT", "ZTT", "ZJ"] #["QCD","W","Diboson", "TT", "ZTT", "ZJ"]
+       bkgs=["Diboson","QCD" ,"W","TT", "ZTT", "ZJ"] #["QCD","W","Diboson", "TT", "ZTT", "ZJ"]
        if is_TT_DD==1:
            bkgs=["QCD","W","Diboson", "TT_DD", "ZTT", "ZJ"]
        return bkgs

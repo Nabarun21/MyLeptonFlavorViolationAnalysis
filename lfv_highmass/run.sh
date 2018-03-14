@@ -26,7 +26,6 @@ set -o errexit
 export MEGAPATH=/hdfs/store/user/ndev/
 source jobid.sh
 export jobid=$jobid13
-
 #rake genkin
 #rake recoplots
 #rake recoplotsMVA

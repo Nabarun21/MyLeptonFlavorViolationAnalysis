@@ -32,33 +32,33 @@ echo $numcategories categories
 echo Signal smaples are : $my_signals
 #make inclusive plots
 
-python plotter_inclusive.py --inputFile mPt.root --analyzer $analyzer --isLog --signals $my_signals --var mPt 
-python plotter_inclusive.py --inputFile ePt.root --analyzer $analyzer --isLog --signals $my_signals --var ePt
-python plotter_inclusive.py --inputFile mPFMET_Mt.root --analyzer $analyzer --isLog --signals $my_signals --var mtMuMet
-python plotter_inclusive.py --inputFile ePFMET_Mt.root --analyzer $analyzer --isLog --signals $my_signals --var mtEMet
-python plotter_inclusive.py --inputFile Met.root --analyzer $analyzer --isLog --signals $my_signals --var met
-python plotter_inclusive.py --inputFile ePFMET_DeltaPhi.root --analyzer $analyzer  --signals $my_signals --var dphiEMet
-python plotter_inclusive.py --inputFile mPFMET_DeltaPhi.root --analyzer $analyzer  --signals $my_signals --var dphiMuMet
-python plotter_inclusive.py --inputFile h_collmass_pfmet.root --analyzer $analyzer --isLog  --signals $my_signals --var colmass
-python plotter_inclusive.py --inputFile h_vismass.root --analyzer $analyzer --isLog  --signals $my_signals --var vismass
-python plotter_inclusive.py --inputFile em_DeltaPhi.root --analyzer $analyzer  --signals $my_signals --var dphiemu
-#python plotter_inclusive.py --inputFile preprocessed_inputs/inclusive/$analyzer//BDT_value.root --analyzer ztautau_CR --isLog --signals $my_signals --var BDT
+python plotter_inclusive.py --lumi $luminosity --inputFile mPt.root --analyzer $analyzer --isLog --signals $my_signals --var mPt 
+python plotter_inclusive.py --lumi $luminosity --inputFile ePt.root --analyzer $analyzer --isLog --signals $my_signals --var ePt
+python plotter_inclusive.py --lumi $luminosity --inputFile mPFMET_Mt.root --analyzer $analyzer --isLog --signals $my_signals --var mtMuMet
+python plotter_inclusive.py --lumi $luminosity --inputFile ePFMET_Mt.root --analyzer $analyzer --isLog --signals $my_signals --var mtEMet
+python plotter_inclusive.py --lumi $luminosity --inputFile Met.root --analyzer $analyzer --isLog --signals $my_signals --var met
+python plotter_inclusive.py --lumi $luminosity --inputFile ePFMET_DeltaPhi.root --analyzer $analyzer  --signals $my_signals --var dphiEMet
+python plotter_inclusive.py --lumi $luminosity --inputFile mPFMET_DeltaPhi.root --analyzer $analyzer  --signals $my_signals --var dphiMuMet
+python plotter_inclusive.py --lumi $luminosity --inputFile h_collmass_pfmet.root --analyzer $analyzer --isLog  --signals $my_signals --var colmass
+python plotter_inclusive.py --lumi $luminosity --inputFile h_vismass.root --analyzer $analyzer --isLog  --signals $my_signals --var vismass
+python plotter_inclusive.py --lumi $luminosity --inputFile em_DeltaPhi.root --analyzer $analyzer  --signals $my_signals --var dphiemu
+#python plotter_inclusive.py --lumi $luminosity --inputFile preprocessed_inputs/inclusive/$analyzer//BDT_value.root --analyzer ztautau_CR --isLog --signals $my_signals --var BDT
 
 
 #make preselection plots
-python plotter.py --inputFile h_collmass_pfmet.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1 --isLog 1 --signals $my_signals
-python plotter.py --inputFile h_vismass.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1 --isLog 1 --signals $my_signals --var vismass
-python plotter.py --inputFile mPt.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1 --isLog 1 --signals $my_signals --var mPt
-python plotter.py --inputFile ePt.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1 --isLog 1 --signals $my_signals --var ePt
-python plotter.py --inputFile mPFMET_Mt.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1 --isLog 1 --signals $my_signals --var mtMuMet
-python plotter.py --inputFile ePFMET_Mt.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1 --isLog 1 --signals $my_signals --var mtEMet
-python plotter.py --inputFile Met.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1 --isLog 1 --signals $my_signals --var met
-python plotter.py --inputFile ePFMET_DeltaPhi.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1  --signals $my_signals --var dphiEMet
-python plotter.py --inputFile mPFMET_DeltaPhi.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1  --signals $my_signals --var dphiMuMet
-python plotter.py --inputFile em_DeltaPhi.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1  --signals $my_signals --var dphiemu
+python plotter.py --lumi $luminosity --inputFile h_collmass_pfmet.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1 --isLog 1 --signals $my_signals
+python plotter.py --lumi $luminosity --inputFile h_vismass.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1 --isLog 1 --signals $my_signals --var vismass
+python plotter.py --lumi $luminosity --inputFile mPt.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1 --isLog 1 --signals $my_signals --var mPt
+python plotter.py --lumi $luminosity --inputFile ePt.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1 --isLog 1 --signals $my_signals --var ePt
+python plotter.py --lumi $luminosity --inputFile mPFMET_Mt.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1 --isLog 1 --signals $my_signals --var mtMuMet
+python plotter.py --lumi $luminosity --inputFile ePFMET_Mt.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1 --isLog 1 --signals $my_signals --var mtEMet
+python plotter.py --lumi $luminosity --inputFile Met.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1 --isLog 1 --signals $my_signals --var met
+python plotter.py --lumi $luminosity --inputFile ePFMET_DeltaPhi.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1  --signals $my_signals --var dphiEMet
+python plotter.py --lumi $luminosity --inputFile mPFMET_DeltaPhi.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1  --signals $my_signals --var dphiMuMet
+python plotter.py --lumi $luminosity --inputFile em_DeltaPhi.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "presel" --blind 1  --signals $my_signals --var dphiemu
 
 
 #make preselection plots
-python plotter.py --inputFile h_collmass_pfmet.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "selected" --blind 1 --isLog 1 --higgsSF 1 --signals $my_signals
-python plotter.py --inputFile h_vismass.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "selected" --blind 1 --isLog 1 --signals $my_signals --var vismass --higgsSF 1
+python plotter.py --lumi $luminosity --inputFile h_collmass_pfmet.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "selected" --blind 1 --isLog 1 --higgsSF 1 --signals $my_signals
+python plotter.py --lumi $luminosity --inputFile h_vismass.root --numCategories $numcategories --analyzer $analyzer --channel "me"  --suffix "selected" --blind 1 --isLog 1 --signals $my_signals --var vismass --higgsSF 1
 
