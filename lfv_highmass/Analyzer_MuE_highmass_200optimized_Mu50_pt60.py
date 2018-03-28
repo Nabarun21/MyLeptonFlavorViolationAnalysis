@@ -342,10 +342,10 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
             self.Z_reweight_H=zpt_file.Get('zptmass_histo')
             zpt_weight=self.Z_reweight_H.GetBinContent(self.Z_reweight_H.GetXaxis().FindBin(row.genM),self.Z_reweight_H.GetYaxis().FindBin(row.genpT))
 
-        print zpt_weight
+  #      print zpt_weight
 
-        if self.isTT:
-            topptreweight=topPtreweight(row.topQuarkPt1,row.topQuarkPt2)
+#        if self.isTT:
+ #           topptreweight=topPtreweight(row.topQuarkPt1,row.topQuarkPt2)
 
         return pu*muidcorr*muisocorr*mutrcorr*mutrkcorr*topptreweight*eidcorr*ereconcorr*zpt_weight
 
