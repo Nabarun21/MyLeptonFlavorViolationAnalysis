@@ -57,6 +57,13 @@ parser.add_argument(
     default="presel",
     help="slection region")
 parser.add_argument(
+    "--region",
+    type=str,
+    action="store",
+    dest="region",
+    default="os",
+    help="region of space: oppositesign-os,samesign-ss,anti-isolated os/ss etc")
+parser.add_argument(
     "--var",
     type=str,
     action="store",
@@ -75,7 +82,7 @@ parser.add_argument(
     type=int,
     action="store",
     dest="higgsSF",
-    default=40,
+    default=20,
     help="Provide the Scale Factor for the SM-Higgs signals.  40x is default for linear")
 parser.add_argument(
     "--higgsSFSM",
@@ -102,7 +109,7 @@ parser.add_argument(
     action="store",
     dest="numCategories",
     default=3,
-    help="Do you want to force blinding?")
+    help="How many categories?")
 args = parser.parse_args()
 
 
@@ -132,7 +139,7 @@ Lumi=args.Lumi
 analyzer=args.analyzer
 variable=args.variable
 channel = args.channel
-higgsSF = args.higgsSF
+higgsSF = args.higgsSF if "CR" not in args.analyzer and args.region!='ss' else 1
 isLog = args.isLog
 suffix = args.suffix
 categories = varCfgPlotter.getCategories( channel, suffix ,args.numCategories)
@@ -143,7 +150,7 @@ if suffix=='presel':
 else:
     selection_region='selection'
 
-fileName = "preprocessed_inputs/"+args.analyzer+str(args.Lumi)+"/"+selection_region+"/"+args.inputFile
+fileName = "preprocessed_inputs/"+args.analyzer+str(args.Lumi)+"/"+selection_region+"/"+args.region+"/"+args.inputFile
 
 if fileName == None :
     fileName = varCfgPlotter.getFile( channel )
@@ -283,7 +290,7 @@ trans=ROOT.TColor(new_idx, adapt.GetRed(), adapt.GetGreen(),adapt.GetBlue(), "",
 
 infoMap = varCfgPlotter.getInfoMap( higgsSF, channel,"" )
 print "infomap ",infoMap
-bkgs = varCfgPlotter.getBackgrounds(channel,args.is_TT_DD)
+bkgs = varCfgPlotter.getBackgrounds(channel,args.is_TT_DD,args.region)
 print "bg  ",bkgs
 signals = varCfgPlotter.getSignals(args.signals)
 print "sig    ",signals
@@ -427,14 +434,14 @@ for cat in categories:
                 hists["data_obs"].SetBinError(k,0)#100000000)
 
 
-                
-    start_blinding_at=160#gev
+    if args.region!='ss':            
+        start_blinding_at=160#gev
 #   always blind discriminating mass histos after a certain value except when plotting CRs 
-    if 'mass' in variable and 'CR' not in args.analyzer:
-        start_bin=hists["data_obs"].FindFixBin(start_blinding_at)
-        for bin in range(start_bin,hists["data_obs"].GetNbinsX()+1):
-            hists["data_obs"].SetBinContent(bin,0)
-            hists["data_obs"].SetBinError(bin,0)
+        if 'mass' in variable and 'CR' not in args.analyzer:
+            start_bin=hists["data_obs"].FindFixBin(start_blinding_at)
+            for bin in range(start_bin,hists["data_obs"].GetNbinsX()+1):
+                hists["data_obs"].SetBinContent(bin,0)
+                hists["data_obs"].SetBinError(bin,0)
 
     hists["data_obs"].Draw("ep")
     stack.Draw("histsame")
@@ -568,23 +575,23 @@ for cat in categories:
     if not os.path.exists("plots/"+analyzer+str(args.Lumi)+TTbar_DD):os.makedirs("plots/"+analyzer+str(args.Lumi)+TTbar_DD)
     
     if args.suffix=='presel':
-        if not os.path.exists("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection"):os.makedirs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection")
+        if not os.path.exists("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection/"+args.region):os.makedirs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection/"+args.region)
 
         if isLog:
-            c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection/"+"log_"+cat+"_"+variable+".pdf")
+            c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection/"+args.region+"/log_"+cat+"_"+variable+".pdf")
     #       c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection/"+"log_"+cat+"_"+variable+".pdf")
         else:
-            c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection/"+cat+"_"+variable+".pdf")
+            c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection/"+args.region+"/"+cat+"_"+variable+".pdf")
     #       c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/preselection/"+cat+"_"+variable+".pdf")
  
     else:
-        if not os.path.exists("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection"):os.makedirs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection")
+        if not os.path.exists("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection/"+args.region):os.makedirs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection/"+args.region)
 
         if isLog:
-            c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection/"+"log_"+cat+"_"+variable+".pdf")
+            c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection/"+args.region+"/log_"+cat+"_"+variable+".pdf")
     #       c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection/"+"log_"+cat+"_"+variable+".pdf")
         else:
-            c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection/"+cat+"_"+variable+".pdf")
+            c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection/"+args.region+"/"+cat+"_"+variable+".pdf")
     #       c.SaveAs("plots/"+analyzer+str(args.Lumi)+TTbar_DD+"/selection/"+cat+"_"+variable+".pdf")
         
      

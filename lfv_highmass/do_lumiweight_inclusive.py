@@ -85,6 +85,7 @@ lumidict['LFV450']=1.0
 lumidict['LFV600']=1.0
 lumidict['LFV750']=1.0
 lumidict['LFV900']=1.0
+lumidict['QCD_mc']=1.0
 
 
 lumidict['QCD']=args.Lumi
@@ -112,7 +113,7 @@ lumidict2['WG']=1.56725042226e-06
 lumidict2['W']=1.56725042226e-06
 lumidict2['T']=5.23465826064e-06
 lumidict2['QCD']=float(1.0)/float(args.Lumi)
-
+lumidict2['QCD_mc']=0.013699241892
 
 
 
@@ -120,9 +121,9 @@ col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(50
 met_vars_binning=array.array('d',(range(0,190,20)+range(200,580,40)+range(600,1010,100)))
 pt_vars_binning=array.array('d',(range(0,190,20)+range(200,500,40)))
 
-col_vis_mass_binning=2
-met_vars_binning=2
-pt_vars_binning=2
+#col_vis_mass_binning=2
+#met_vars_binning=2
+#pt_vars_binning=2
 
 variable_list=[
    ('BDT_value', 'BDT_value', 1),
@@ -155,6 +156,7 @@ for var in variable_list:
    histos[category]=[]
    for filename in os.listdir('Analyzer_MuE_'+args.analyzer_name+str(args.Lumi)):
       if "FAKES" in filename or "ETau" in filename or "QCD_with_shapes" in filename:continue
+      if args.region=='ss' and 'QCD' in filename:continue
       file=ROOT.TFile('Analyzer_MuE_'+args.analyzer_name+str(args.Lumi)+'/'+filename)
       new_title=filename.split('.')[0]
       hist_path=args.region+"/"+var[0]
@@ -164,14 +166,16 @@ for var in variable_list:
 
       if not histo:
          continue
-      try:
-         histo.Rebin(binning*2)
-      except TypeError:
-         histo=histo.Rebin(len(binning)-1,"",binning)
-      except:
-         print "Please fix your binning"
+
+      if new_title!='QCD':
+         try:
+            histo.Rebin(binning*2)
+         except TypeError:
+            histo=histo.Rebin(len(binning)-1,"",binning)
+         except:
+            print "Please fix your binning"
          
-      if 'data' not in filename and 'QCD' not in filename and 'TT_DD' not in filename:
+      if 'data' not in filename and 'QCD'!=filename and 'TT_DD' not in filename:
          histo.Scale(lumidict['data_obs']/lumidict[new_title])      
       if 'data' in filename:
          histo.SetBinErrorOption(ROOT.TH1.kPoisson)
@@ -202,7 +206,7 @@ for var in variable_list:
    if not histo:
       continue
 
-   outputfile=ROOT.TFile(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/inclusive/"+var[0]+".root","recreate")
+   outputfile=ROOT.TFile(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/inclusive/"+args.region+"/"+var[0]+".root","recreate")
 
 #   print outputfile
    outputfile.cd()

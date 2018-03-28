@@ -41,8 +41,8 @@ def getCategories( channel="et", suffix="",num_categories=3 ) :
             categories[0]="mutaue_01jet_"+suffix
             categories[1]="mutaue_rest_"+suffix
         else:
-            print 'num_categories needs to be 2 or 3'
-            exit
+            raise ValueError( 'num_categories needs to be 2 or 3')
+            
 
 
     return categories
@@ -92,9 +92,11 @@ def getInfoMap( higgsSF, channel, shift="" ) :
     return infoMap
 
 
-def getBackgrounds(channel,is_TT_DD=None) :
+def getBackgrounds(channel,is_TT_DD=None,region='os') :
     if channel=="em" or channel=="me":    
        bkgs=["Diboson","QCD" ,"W","TT", "ZTT", "ZJ"] #["QCD","W","Diboson", "TT", "ZTT", "ZJ"]
+       if region=='ss':
+           bkgs=["Diboson","W","TT", "ZTT", "ZJ"] #["QCD","W","Diboson", "TT", "ZTT", "ZJ"]
        if is_TT_DD==1:
            bkgs=["QCD","W","Diboson", "TT_DD", "ZTT", "ZJ"]
        return bkgs

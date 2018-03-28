@@ -86,6 +86,7 @@ lumidict['LFV450']=1.0
 lumidict['LFV600']=1.0
 lumidict['LFV750']=1.0
 lumidict['LFV900']=1.0
+lumidict['QCD_mc']=1.0
 
 
 lumidict['QCD']=args.Lumi
@@ -109,7 +110,7 @@ lumidict2['LFV450']=4.65541809702e-08
 lumidict2['LFV600']=2.04664734848e-08 
 lumidict2['LFV750']=9.93800000005e-09
 lumidict2['LFV900']=5.37000000001e-09 
-
+lumidict2['QCD_mc']=0.013699241892
 lumidict2['WG']=1.56725042226e-06
 lumidict2['W']=1.56725042226e-06
 lumidict2['T']=5.23465826064e-06
@@ -281,13 +282,13 @@ for var in variable_list:
                print "Couldn't find histo: ",title+" "+syst_names_analyzer[k]
                continue
 
-
-            try:
-               histo.Rebin(binning*2)
-            except TypeError:
-               histo=histo.Rebin(len(binning)-1,"",binning)
-            except:
-               print "Please fix your binning"
+            if 'QCD'!=title:
+               try:
+                  histo.Rebin(binning*2)
+               except TypeError:
+                  histo=histo.Rebin(len(binning)-1,"",binning)
+               except:
+                  print "Please fix your binning"
 
 
             if 'data' not in filename and 'QCD' not in filename and 'TT_DD' not in filename and "_with_shapes" not in filename:

@@ -51,6 +51,7 @@ samples = Hash[
                "DY" => get_sample_names('DYJetsToLL_M-50')+get_sample_names('DY1JetsToLL_M-50')+get_sample_names('DY2JetsToLL_M-50')+get_sample_names('DY3JetsToLL_M-50')+get_sample_names('DY4JetsToLL_M-50'),
                "ZTT" => get_sample_names('ZTauTauJets_M-50')+get_sample_names('ZTauTau1Jets_M-50')+get_sample_names('ZTauTau2Jets_M-50')+get_sample_names('ZTauTau3Jets_M-50')+get_sample_names('ZTauTau4Jets_M-50'),
                "DYlowmass" => get_sample_names('DYJetsToLL_M-10to50')+get_sample_names('DY1JetsToLL_M-10to50')+get_sample_names('DY2JetsToLL_M-10to50')+get_sample_names('DY3JetsToLL_M-10to50')+get_sample_names('DY4JetsToLL_M-10to50'),
+               "QCD_mc" => get_sample_names('QCD_Pt-20toInf_MuEnrichedPt15'),
    
 	       "DYinclus" => get_sample_names('DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'),
                "signal200" => get_sample_names('GluGlu_LFV_HToMuTau_M200')+get_sample_names('VBF_LFV_HToMuTau_M200'),
@@ -103,64 +104,23 @@ end
 
 
 
-task :runhighmass => get_analyzer_results("Analyzer_MuE_highmass",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau']+samples['excldiboson']+samples['hww']+samples['htautau'])
-
-task :runhighmass450 => get_analyzer_results("Analyzer_MuE_highmass_450optimized",samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH'])
-
-task :runhighmass200 => get_analyzer_results("Analyzer_MuE_highmass_200optimized",samples['officialsignalMCMuTaugg']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau']+samples['excldiboson']+samples['hww']+samples['htautau'])
-
-task :runhighmass450_Mu50 => get_analyzer_results("Analyzer_MuE_highmass_450optimized_Mu50",samples['signalMCMuTaugg']+samples['ttbar']+samples['DY']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['excldiboson'])
-
-task :runhighmass450_pt165 => get_analyzer_results("Analyzer_MuE_highmass_450optimized_Mu50_pt165",samples['signalMCMuTaugg']+samples['ttbar']+samples['DY']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['excldiboson'])
+task :runhighmass => get_analyzer_results("Analyzer_MuE_highmass",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau']+samples['excldiboson']+samples['hww']+samples['htautau']+samples['QCD_mc'])
 
 
-task :runhighmass450_pt155 => get_analyzer_results("Analyzer_MuE_highmass_450optimized_Mu50_pt155",samples['signalMCMuTaugg']+samples['ttbar']+samples['DY']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['excldiboson'])
+task :runhighmass200_pt60 => get_analyzer_results("Analyzer_MuE_highmass_200optimized_Mu50_pt60",samples['QCD_mc'])
 
+task :runhighmass450_Mu50 => get_analyzer_results("Analyzer_MuE_highmass_450optimized_Mu50",samples['QCD_mc'])
 
-task :runhighmass450_pt160 => get_analyzer_results("Analyzer_MuE_highmass_450optimized_Mu50_pt160",samples['signalMCMuTaugg']+samples['ttbar']+samples['DY']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['excldiboson'])
-
-task :runhighmass200_pt60 => get_analyzer_results("Analyzer_MuE_highmass_200optimized_Mu50_pt60",samples['signalMCMuTaugg']+samples['ttbar']+samples['DY']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['excldiboson'])
-
-task :runhighmass200_pt65 => get_analyzer_results("Analyzer_MuE_highmass_200optimized_Mu50_pt65",samples['signalMCMuTaugg']+samples['ttbar']+samples['DY']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['excldiboson'])
-
-
-task :runhighmass200_notprw => get_analyzer_results("Analyzer_MuE_highmass_200optimized_Mu50_pt60_notprw",samples['ttbar'])
-
-task :runhighmass450_notprw => get_analyzer_results("Analyzer_MuE_highmass_450optimized_Mu50_notprw",samples['ttbar'])
-
-task :runhighmass200_ttbarCR_notprw => get_analyzer_results("Analyzer_MuE_200_ttbarCR_notprw",samples['ttbar'])
-
-
-task :runhighmass450_Mu50 => get_analyzer_results("Analyzer_MuE_highmass_450optimized_Mu50",samples['signalMCMuTaugg']+samples['ttbar']+samples['DY']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['excldiboson'])
+task :runhighmass200_pt60_QCDCR => get_analyzer_results("Analyzer_MuE_highmass_200optimized_Mu50_pt60_QCD_CR",samples['signalMCMuTaugg']+samples['ttbar']+samples['DY']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['excldiboson']+samples['QCD_mc'])
 
 task :runhighmass450_ttbarCR => get_analyzer_results("Analyzer_MuE_450_ttbarCR",samples['signalMCMuTaugg']+samples['ttbar']+samples['DY']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['excldiboson'])
 
 task :runhighmass200_ttbarCR => get_analyzer_results("Analyzer_MuE_200_ttbarCR",samples['signalMCMuTaugg']+samples['ttbar']+samples['DY']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['excldiboson'])
 
-task :runhighmass200_Mu50 => get_analyzer_results("Analyzer_MuE_highmass_200optimized_Mu50",samples['signalMCMuTaugg']+samples['ttbar']+samples['DY']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['excldiboson'])
 
 task :runhighmass450_QCDCR => get_analyzer_results("Analyzer_MuE_highmass_450optimized_QCDCR",samples['officialsignalMCMuTaugg']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau']+samples['excldiboson']+samples['hww']+samples['htautau'])
 
 task :runhighmass200_QCDCR => get_analyzer_results("Analyzer_MuE_highmass_200optimized_QCDCR",samples['officialsignalMCMuTaugg']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau']+samples['excldiboson']+samples['hww']+samples['htautau'])
-
-task :runhighmass450_ept30 => get_analyzer_results("Analyzer_MuE_highmass_450optimized_ept30",samples['officialsignalMCMuTaugg']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau']+samples['excldiboson']+samples['hww']+samples['htautau'])
-
-
-task :run_optim_highmass14 => get_analyzer_results("Optimizer_MuE_highmass14",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau']+samples['excldiboson']+samples['hww']+samples['htautau']
-)
-
-
-task :ttbar_1bjet_3 => get_analyzer_results("Analyzer_MuE_ttbarCR_1bjet_3",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau']+samples['excldiboson']+samples['hww']+samples['htautau'])
-
-task :ttbar_1or2bjet => get_analyzer_results("Analyzer_MuE_ttbarCR_1or2bjet",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau']+samples['excldiboson']+samples['hww']+samples['htautau'])
-
- 
-
-task :QCDCR => get_analyzer_results("Analyzer_MuE_QCDCR",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['ttbar']+samples['DY']+samples['ggHiggsTo2Taus']+samples['vbfHiggsTo2Taus']+samples['wjets']+samples['wg']+samples['ZTT']+samples['singlet']+samples['dataB']+samples['dataC']+samples['dataD']+samples['dataE']+samples['dataF']+samples['dataG']+samples['dataH']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau']+samples['excldiboson']+samples['hww']+samples['htautau'])
-
-
-
-
 
 
 task :runBDTtreemaker => get_analyzer_results("LFVHEMuAnalyzerMVAmakeBDTtrees",samples['signalMCMuTaugg']+samples['signalMCMuTauvbf']+samples['ttbar']+samples['DY']+samples['DYlowmass']+samples['signalMCggEtau']+samples['signalMCvbfEtau'])

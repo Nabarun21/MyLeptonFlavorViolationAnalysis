@@ -119,16 +119,20 @@ syst_names_analyzer=['mesup','mesdown','eesup','eesdown','eresrhoup','eresrhodow
                 'jes_JetTimePtEtaUp']      #sysfolder names in analyzer
 
 
+col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,990,50)+range(1000,1520,100)))
+met_vars_binning=array.array('d',(range(0,190,20)+range(200,580,40)+range(600,1010,100)))
+pt_vars_binning=array.array('d',(range(0,190,20)+range(200,500,40)))
+
 variables = [
 #	('BDT_value', 'BDT_value', 1),
-	('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', 1),
+	('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', col_vis_mass_binning),
 
 	]
 
 
 
 commonvars=[
-   ('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', 5),
+   ('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', col_vis_mass_binning),
    ]
 
 
@@ -148,6 +152,7 @@ class GetQCD(object):
 		self.datafile=file=ROOT.TFile(Analyzer+str(args.Lumi)+"/data_obs.root")
 		print self.datafile
 	        for var in variables:
+			binning=var[2]
 	        	for sign in regions:#,'antiIsolatedweightedmuonelectron/ss','antiIsolatedweightedelectron/ss','antiIsolatedweightedmuon/ss']:
 	        		for j in ['fullsel']:
 	        			for i in range(len(categories)):
@@ -164,6 +169,14 @@ class GetQCD(object):
 								histo=file.Get(hist_path)
 								if not histo:
 									continue
+						
+								try:
+									histo.Rebin(binning*2)
+								except TypeError:
+									histo=histo.Rebin(len(binning)-1,"",binning)
+								except:
+									print "Please fix your binning"
+
 								try:
 									self.histomc.Add(histo)
 								except AttributeError:

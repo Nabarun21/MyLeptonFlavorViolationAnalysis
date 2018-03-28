@@ -14,7 +14,7 @@ export MEGAPATH=/hdfs/store/user/ndev
 
 
 
-rake "meta:getinputs[$jobid, $datasrc,em/metaInfo,em/summedWeights]"
+#rake "meta:getinputs[$jobid, $datasrc,em/metaInfo,em/summedWeights]"
 rake "meta:getmeta[inputs/$jobid,em/metaInfo, 13,em/summedWeights]"
 #./make_proxies.sh
 #RakeOA "emta:getinputs[$jobid, $datasrc,ee/emtaInfo]"

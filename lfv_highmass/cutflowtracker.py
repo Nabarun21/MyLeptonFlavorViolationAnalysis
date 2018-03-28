@@ -18,10 +18,8 @@ class cut_flow_tracker(object):
 
     def Fill(self, *labels):
         if self.disabled:
-#            print "guja"
             return
         for label in labels:
-#            print label
             self.fill(label)
 
     def flush(self):

@@ -25,7 +25,7 @@ from inspect import currentframe
 
 
 
-cut_flow_step=['allEvents','HLTIsoPasstrg','surplus_mu_veto','surplus_e_veto','surplus_tau_veto','bjetveto','mu_ptid','mulooseiso','e_ptid','elooseiso','ecalgap','DR_e_mu','sel_mupt','sel_dphiemu','sel_dphiemet']
+cut_flow_step=['allEvents','HLTIsoPasstrg','surplus_mu_veto','surplus_e_veto','surplus_tau_veto','bjetveto','mu_ptid','mulooseiso','e_ptid','elooseiso','ecalgap','DR_e_mu','muiso','eiso','full_presel','sel_mupt','sel_dphiemu','sel_dphiemet']
 
 
 def deltaPhi(phi1, phi2):
@@ -89,11 +89,11 @@ eId_corrector = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017( 'no
 erecon_corrector=EGammaPOGCorrections.make_egamma_pog_recon_MORIOND17()
 zpt_file=ROOT.TFile("zpt_weights_2016_BtoH.root")
 
-class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
+class Analyzer_MuE_highmass_200optimized_Mu50_pt60_QCD_CR(MegaBase):
     tree = 'em/final/Ntuple'
     def __init__(self, tree, outfile, **kwargs):
         self.channel='EMu'
-        super(Analyzer_MuE_highmass_200optimized_Mu50_pt60, self).__init__(tree, outfile, **kwargs)
+        super(Analyzer_MuE_highmass_200optimized_Mu50_pt60_QCD_CR, self).__init__(tree, outfile, **kwargs)
         target = os.path.basename(os.environ['megatarget'])
         self.target=target
 
@@ -110,7 +110,7 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
         self.isData=('data' in target)
 
         #set systematics flag to true if you want shape syustematic histos
-        self.syscalc=True
+        self.syscalc=False
         
         self.isWGToLNuG=( 'WGToLNuG' in target)
         self.isWGstarToLNuEE=('WGstarToLNuEE' in target)
@@ -342,7 +342,6 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
             self.Z_reweight_H=zpt_file.Get('zptmass_histo')
             zpt_weight=self.Z_reweight_H.GetBinContent(self.Z_reweight_H.GetXaxis().FindBin(row.genM),self.Z_reweight_H.GetYaxis().FindBin(row.genpT))
 
-        print zpt_weight
 
         if self.isTT:
             topptreweight=topPtreweight(row.topQuarkPt1,row.topQuarkPt2)
@@ -1172,16 +1171,18 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
  
 
                 if not isMuonTight and not isElecTight: #double fakes, should be tiny
-                    region="eLoosemLoose"
-                elif not isMuonTight and  isElecTight:   # mu fakes, should be small
-                    region="eTightmLoose"
-                elif  isMuonTight and not isElecTight: #e fakes, most fakes should come from here
-                    region="eLoosemTight"
-                elif isMuonTight and isElecTight: #signal region
                     region="signal"
+                elif not isMuonTight and  isElecTight:   # mu fakes, should be small
+                    region="signal"
+                elif  isMuonTight and not isElecTight: #e fakes, most fakes should come from here
+                    region="signal"
+                elif isMuonTight and isElecTight: #signal region
+                    region="not signal"
             
                 if region!="signal":continue    
                 
+                if sys=='nosys':
+                        cut_flow_trk.Fill('full_presel')
                 jn = self.shifted_jetVeto30
                 if jn >= 2:
                     category=2
@@ -1262,13 +1263,13 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
                 
                 
             if not isMuonTight and not isElecTight: #double fakes, should be tiny
-                region="eLoosemLoose"
-            elif not isMuonTight and  isElecTight:   # mu fakes, should be small
-                region="eTightmLoose"
-            elif  isMuonTight and not isElecTight: #e fakes, most fakes should come from here
-                region="eLoosemTight"
-            elif isMuonTight and isElecTight: #signal region
                 region="signal"
+            elif not isMuonTight and  isElecTight:   # mu fakes, should be small
+                region="signal"
+            elif  isMuonTight and not isElecTight: #e fakes, most fakes should come from here
+                region="signal"
+            elif isMuonTight and isElecTight: #signal region
+                region="not signal"
                 
             if region!="signal":continue    
 

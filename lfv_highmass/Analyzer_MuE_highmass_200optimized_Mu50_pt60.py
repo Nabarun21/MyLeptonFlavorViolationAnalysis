@@ -25,7 +25,7 @@ from inspect import currentframe
 
 
 
-cut_flow_step=['allEvents','HLTIsoPasstrg','DR_e_mu','surplus_mu_veto','surplus_e_veto','surplus_tau_veto','musel','mulooseiso','esel','elooseiso','ecalgap','bjetveto','muiso','eiso','jet0sel','jet1sel','jet2loosesel','jet2tightsel']
+cut_flow_step=['allEvents','HLTIsoPasstrg','surplus_mu_veto','surplus_e_veto','surplus_tau_veto','bjetveto','mu_ptid','mulooseiso','e_ptid','elooseiso','ecalgap','DR_e_mu','muiso','eiso','full_presel','sel_mupt','sel_dphiemu','sel_dphiemet']
 
 
 def deltaPhi(phi1, phi2):
@@ -87,7 +87,7 @@ mtrk_corrector = MuonPOGCorrections.mu_trackingEta_MORIOND2017
 #eId_corrector = EGammaPOGCorrections.make_egamma_pog_electronID_ICHEP2016( 'nontrigWP80')
 eId_corrector = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017( 'nontrigWP80')
 erecon_corrector=EGammaPOGCorrections.make_egamma_pog_recon_MORIOND17()
-
+zpt_file=ROOT.TFile("zpt_weights_2016_BtoH.root")
 
 class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
     tree = 'em/final/Ntuple'
@@ -132,6 +132,9 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
         self.isGluGlu_LFV_HToMuTau_M900=('GluGlu_LFV_HToMuTau_M900' in target )
 
 
+        self.isQCD_mc=('QCD_Pt-20toInf_MuEnrichedPt15_TuneCUETP8M1_13TeV_pythia8_v6-v1' in target)
+        
+        
         self.isWZTo2L2Q=('WZTo2L2Q' in target)
         self.isVVTo2L2Nu=('VVTo2L2Nu' in target)
         self.isWWTo1L1Nu2Q=('WWTo1L1Nu2Q' in target)
@@ -189,6 +192,7 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
         self.GluGlu_LFV_HToMuTau_M600_weight=2.04664734848e-08  #1.2625e-07    #1.9432e-06 
         self.GluGlu_LFV_HToMuTau_M750_weight=9.93800000005e-09            #1.9432e-06 
         self.GluGlu_LFV_HToMuTau_M900_weight=5.37000000001e-09            #1.9432e-06 
+        self.QCD_mc_weight=0.013699241892  
 
 
         self.VBF_LFV_HToMuTau_M120_weight=1.01169556062e-07            #1.9432e-06 
@@ -331,11 +335,19 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
 #        print eisocorr
 
         topptreweight=1
+        zpt_weight=1
+        
+        
+        if self.is_DYJet or self.is_ZTauTau or self.is_DYlowmass:
+            self.Z_reweight_H=zpt_file.Get('zptmass_histo')
+            zpt_weight=self.Z_reweight_H.GetBinContent(self.Z_reweight_H.GetXaxis().FindBin(row.genM),self.Z_reweight_H.GetYaxis().FindBin(row.genpT))
+
+        print zpt_weight
 
         if self.isTT:
             topptreweight=topPtreweight(row.topQuarkPt1,row.topQuarkPt2)
 
-        return pu*muidcorr*muisocorr*mutrcorr*mutrkcorr*topptreweight*eidcorr*ereconcorr
+        return pu*muidcorr*muisocorr*mutrcorr*mutrkcorr*topptreweight*eidcorr*ereconcorr*zpt_weight
 
 
     def correction(self,row,region,pileup):
@@ -510,6 +522,10 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
             weight=self.ZZTo2L2Q_weight*self.event_weight(row,region,pileup) 
         elif self.isZZTo4L:
             weight=self.ZZTo4L_weight*self.event_weight(row,region,pileup) 
+
+        elif self.isQCD_mc:
+            print 'isqcd'
+            weight=self.QCD_mc_weight*self.event_weight(row,region,pileup) 
         
         elif self.isTT:
             weight=self.TT_weight*self.event_weight(row,region,pileup) 
@@ -1114,35 +1130,44 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
  
             #mu preselection
                 if not selections.muSelection(row,self.my_muon, 'm'): continue
-                cut_flow_trk.Fill('musel')
+                if sys=='nosys':
+                    cut_flow_trk.Fill('mu_ptid')
                 if not selections.lepton_id_iso(row, 'm', 'MuIDTight_idiso0p25',dataperiod=self.data_period): continue
-                cut_flow_trk.Fill('mulooseiso')
+                if sys=='nosys':
+                    cut_flow_trk.Fill('mulooseiso')
 
 
             #E Preselection
                 if not selections.eSelection(row,self.my_elec,'e'): continue
-                cut_flow_trk.Fill('esel')
+                if sys=='nosys':
+                    cut_flow_trk.Fill('e_ptid')
 
                 if not selections.lepton_id_iso(row, 'e', 'eid15Loose_etauiso1',eIDwp='WP80'): continue
-                cut_flow_trk.Fill('elooseiso')
+                if sys=='nosys':
+                    cut_flow_trk.Fill('elooseiso')
 
 
            #take care of ecal gap
                 if abs(self.my_elec.Eta()) > 1.4442 and abs(self.my_elec.Eta()) < 1.566 : continue             
-            
+                if sys=='nosys':
+                    cut_flow_trk.Fill('ecalgap')
+
                 if deltaR(self.my_elec.Phi(),self.my_muon.Phi(),self.my_elec.Eta(),self.my_muon.Eta())<0.3:continue
-                cut_flow_trk.Fill('DR_e_mu')
+                if sys=='nosys':
+                    cut_flow_trk.Fill('DR_e_mu')
 
 
             ## now divide by e-mu isolation regions, looseloose,loosetight,tightloose,tighttight
                 isMuonTight=False
                 if selections.lepton_id_iso(row, 'm', 'MuIDTight_mutauiso0p15',dataperiod=self.data_period):
-                    cut_flow_trk.Fill('muiso')
+                    if sys=='nosys':
+                        cut_flow_trk.Fill('muiso')
                     isMuonTight=True
 
                 isElecTight=False
                 if selections.lepton_id_iso(row, 'e', 'eid15Loose_etauiso0p1',eIDwp='WP80'): 
-                    cut_flow_trk.Fill('eiso')
+                    if sys=='nosys':
+                        cut_flow_trk.Fill('eiso')
                     isElecTight=True
  
 
@@ -1157,6 +1182,9 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
             
                 if region!="signal":continue    
                 
+                if sys=='nosys':
+                    cut_flow_trk.Fill('full_presel')
+
                 jn = self.shifted_jetVeto30
                 if jn >= 2:
                     category=2
@@ -1173,10 +1201,15 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
 
             
                 if self.my_muon.Pt() < 60: continue 
+                if sys=='nosys':
+                    cut_flow_trk.Fill('sel_mupt')
                 if self.my_elec.Pt() < 10: continue
                 if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.2 : continue
+                if sys=='nosys':
+                    cut_flow_trk.Fill('sel_dphiemu')
                 if abs(self.shifted_eDPhiToPfMet) > 0.7 : continue
-                cut_flow_trk.Fill('jet0sel')
+                if sys=='nosys':
+                    cut_flow_trk.Fill('sel_dphiemet')
 
                 folder = sign+'/'+str(int(category))+'/selected/'+sys
                 self.fill_histos(row,sign,folder,False,region,btagweight,sys,qcdshaperegion,self.pileup)
@@ -1205,20 +1238,14 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
 
            # preselection
             if not selections.muSelection(row,self.my_muon, 'm'): continue
-            cut_flow_trk.Fill('musel')
             if not selections.lepton_id_iso(row, 'm', 'MuIDTight_idiso0p25',dataperiod=self.data_period): continue
-            cut_flow_trk.Fill('mulooseiso')
+
 
 
            #Preselection
             if not selections.eSelection(row,self.my_elec,'e'): continue
-            cut_flow_trk.Fill('esel')
 
             if not selections.lepton_id_iso(row, 'e', 'eid15Loose_etauiso1',eIDwp='WP80'): continue
-            cut_flow_trk.Fill('elooseiso')
-
-           
-
 
 
 
@@ -1226,18 +1253,14 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
             if abs(self.my_elec.Eta()) > 1.4442 and abs(self.my_elec.Eta()) < 1.566 : continue             
            
             if deltaR(self.my_elec.Phi(),self.my_muon.Phi(),self.my_elec.Eta(),self.my_muon.Eta())<0.3:continue
-            cut_flow_trk.Fill('DR_e_mu')
-
 
            #take now divide by e-mu isolation regions, looseloose,loosetight,tightloose,tighttight
             isMuonTight=False
             if selections.lepton_id_iso(row, 'm', 'MuIDTight_mutauiso0p15',dataperiod=self.data_period):
-                cut_flow_trk.Fill('muiso')
                 isMuonTight=True
 
             isElecTight=False
             if selections.lepton_id_iso(row, 'e', 'eid15Loose_etauiso0p1',eIDwp='WP80'): 
-                cut_flow_trk.Fill('eiso')
                 isElecTight=True
                 
                 
@@ -1252,6 +1275,7 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
                 
             if region!="signal":continue    
 
+            
             for jetsys in self.jetsysdir:
                 self.shifted_jetVeto30=getattr(row, jetsys.replace('jes','jetVeto30'))
                 jn = self.shifted_jetVeto30
@@ -1278,7 +1302,7 @@ class Analyzer_MuE_highmass_200optimized_Mu50_pt60(MegaBase):
                 if self.my_elec.Pt() < 10: continue
                 if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.2 : continue
                 if abs(self.shifted_eDPhiToPfMet) > 0.7 : continue
-                cut_flow_trk.Fill('jet0sel')
+
 
                 folder = sign+'/'+str(int(category))+'/selected/'+jetsys
                 self.fill_histos(row,sign,folder,False,region,btagweight,jetsys,qcdshaperegion,self.pileup)

@@ -58,6 +58,9 @@ parser.add_argument(
 args = parser.parse_args()
 
 
+col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,990,50)+range(1000,1520,100)))
+met_vars_binning=array.array('d',(range(0,190,20)+range(200,580,40)+range(600,1010,100)))
+pt_vars_binning=array.array('d',(range(0,190,20)+range(200,500,40)))
 
 
 categories=[str(cat) for cat in range(args.numCategories)]   #category names in analyzer                                                                                    
@@ -66,49 +69,43 @@ categories=[str(cat) for cat in range(args.numCategories)]   #category names in 
 syst_names=[]      #sysfolder names in analyzer                                             
 if args.doSyst:                                                                                                                                              
 	syst_names=['jetup','jetdown','uup','udown','mesup','mesdown','eesup','eesdown']      #sysfolder names in analyzer                                             
-
-variables = [
-	('BDT_value', 'BDT_value', 1),
-	('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', 1),
-	('mPt', 'p_{T}(mu) (GeV)', 4),
-	('mEta', 'eta(mu)', 1),
-	('mPhi', 'phi(mu)', 2),
-	('ePt', 'p_{T}(e) (GeV)', 4),
-	('eEta', 'eta(e)', 1),
-	('ePhi', 'phi(e)', 2),
-	('em_DeltaPhi', 'emu Deltaphi', 1),
-	('em_DeltaR', 'emu Delta R', 1),
-	('h_vismass', 'M_{vis} (GeV)', 1),
-	('Met', 'MET (GeV)', 1),
-	('ePFMET_Mt', 'MT-e-MET (GeV)', 4),
-	('mPFMET_Mt', 'MT-mu-MET (GeV)', 4),
-	('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 1),
-	('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 1),
-	('jetN_30', 'number of jets (p_{T} > 30 GeV)', 1),
-	]
-
-
-
-commonvars=[
+variables=[
    ('BDT_value', 'BDT_value', 1),
-   ('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', 5),
-   ('mPt', 'p_{T}(mu) (GeV)', 5),
+   ('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', col_vis_mass_binning),
+   ('mPt', 'p_{T}(mu) (GeV)', pt_vars_binning),
    ('mEta', 'eta(mu)', 1),
    ('mPhi', 'phi(mu)', 2),
-   ('ePt', 'p_{T}(e) (GeV)', 5),
+   ('ePt', 'p_{T}(e) (GeV)', pt_vars_binning),
    ('eEta', 'eta(e)', 1),
    ('ePhi', 'phi(e)', 2),
    ('em_DeltaPhi', 'emu Deltaphi', 1),
    ('em_DeltaR', 'emu Delta R', 1),
-   ('h_vismass', 'M_{vis} (GeV)', 5),
-   ('Met', 'MET (GeV)', 1),
-   ('ePFMET_Mt', 'MT-e-MET (GeV)', 5),
-   ('mPFMET_Mt', 'MT-mu-MET (GeV)', 5),
+   ('h_vismass', 'M_{vis} (GeV)', col_vis_mass_binning),
+   ('Met', 'MET (GeV)', pt_vars_binning),
+   ('ePFMET_Mt', 'MT-e-MET (GeV)', met_vars_binning),
+   ('mPFMET_Mt', 'MT-mu-MET (GeV)', met_vars_binning),
    ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 1),
    ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 1),
    ]
 
-
+variable_list=[
+   ('BDT_value', 'BDT_value', 1),
+   ('h_collmass_pfmet', 'M_{coll}(e#mu) (GeV)', col_vis_mass_binning),
+   ('mPt', 'p_{T}(mu) (GeV)', pt_vars_binning),
+   ('mEta', 'eta(mu)', 1),
+   ('mPhi', 'phi(mu)', 2),
+   ('ePt', 'p_{T}(e) (GeV)', pt_vars_binning),
+   ('eEta', 'eta(e)', 1),
+   ('ePhi', 'phi(e)', 2),
+   ('em_DeltaPhi', 'emu Deltaphi', 1),
+   ('em_DeltaR', 'emu Delta R', 1),
+   ('h_vismass', 'M_{vis} (GeV)', col_vis_mass_binning),
+   ('Met', 'MET (GeV)', pt_vars_binning),
+   ('ePFMET_Mt', 'MT-e-MET (GeV)', met_vars_binning),
+   ('mPFMET_Mt', 'MT-mu-MET (GeV)', met_vars_binning),
+   ('ePFMET_DeltaPhi', 'Deltaphi-e-MET (GeV)', 1),
+   ('mPFMET_DeltaPhi', 'Deltaphi-mu-MET (GeV)', 1),
+   ]
 
 regions=['ss']
 regions_common=['ss']
@@ -123,6 +120,7 @@ class GetQCD(object):
 	        self.histodata=None
 	        self.histoQCD=None
 	        for var in variables:
+			binning=var[2]
 	        	for sign in regions:#,'antiIsolatedweightedmuonelectron/ss','antiIsolatedweightedelectron/ss','antiIsolatedweightedmuon/ss']:
 	        		for j in ['presel','fullsel']:
 	        			for i in range(len(categories)):
@@ -142,8 +140,18 @@ class GetQCD(object):
 							if "FAKES" in filename or "QCD" in filename: continue
 	        					file=ROOT.TFile(Analyzer+str(args.Lumi)+"/"+filename)
 							histo=file.Get(hist_path)
+							
 							if not histo:
 								continue
+						
+							try:
+								histo.Rebin(binning*2)
+							except TypeError:
+								histo=histo.Rebin(len(binning)-1,"",binning)
+							except:
+								print "Please fix your binning"
+
+								
 #							print hist_path,"   ",filename,"   ",var[0],"  ",histo.Integral()
 	        					if "data"  not in filename and "FAKES" not in filename and "LFV" not in filename and "QCD" not in filename:
 								if x==0:
@@ -181,7 +189,8 @@ class GetQCD(object):
 						path_name_original_redacted='/'.join(path_name_original[0:(len(path_name_original)-1)])
 						new_path_name=path_name_original_redacted.replace('ss','os',1)
 						self.histos[(new_path_name,var[0])]=new_histo
-	        for var in commonvars:
+	        for var in variables:
+			binning=var[2]
 	        	for sign in regions_common:
 				x=0
 				y=0
@@ -198,7 +207,12 @@ class GetQCD(object):
 					if not histo:
 						continue
 
-				
+					try:
+						histo.Rebin(binning*2)
+					except TypeError:
+						histo=histo.Rebin(len(binning)-1,"",binning)
+					except:
+						print "Please fix your binning"
 
 #					print hist_path,"   ",filename,"   ",var[0],"  ",histo.Integral()
 					if "data"  not in filename and "FAKES" not in filename and "LFV" not in filename and "QCD" not in filename:
@@ -224,7 +238,7 @@ class GetQCD(object):
 #						print "MC",self.histomc.Integral()
 				self.histoQCD=self.histodata.Clone()
 				self.histoQCD.Add(self.histomc,-1)
-				self.histoQCD.Scale(2.3)
+				self.histoQCD.Scale(2.2)
 
 				new_histo=copy.copy(self.histoQCD) #MAKE DEEP COPY 
 					#replace ss in pathname by os

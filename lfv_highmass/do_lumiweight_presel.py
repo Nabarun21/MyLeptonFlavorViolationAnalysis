@@ -23,6 +23,13 @@ parser.add_argument(
     default="cut_based",
     help="type of analyzer: cut_based, BDT, neural_net")
 parser.add_argument(
+    "--region",
+    type=str,
+    action="store",
+    dest="region",
+    default="os",
+    help="region of space: oppositesign-os,samesign-ss,anti-isolated os/ss etc")
+parser.add_argument(
     "--aName",
     type=str,
     action="store",
@@ -86,6 +93,7 @@ lumidict['LFV450']=1.0
 lumidict['LFV600']=1.0
 lumidict['LFV750']=1.0
 lumidict['LFV900']=1.0
+lumidict['QCD_mc']=1.0
 
 
 lumidict['QCD']=args.Lumi
@@ -109,6 +117,7 @@ lumidict2['LFV450']=4.65541809702e-08
 lumidict2['LFV600']=2.04664734848e-08 
 lumidict2['LFV750']=9.93800000005e-09
 lumidict2['LFV900']=5.37000000001e-09 
+lumidict2['QCD_mc']=0.013699241892
 
 lumidict2['WG']=1.56725042226e-06
 lumidict2['W']=1.56725042226e-06
@@ -151,10 +160,10 @@ else:
    print "number of categories must be 1 or 2"
    exit
 
-try:
+if not os.path.exists(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/preselection"):
    os.makedirs(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/preselection")
-except Exception as ex:
-   print ex
+if not os.path.exists(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/preselection/"+args.region):
+   os.makedirs(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/preselection/"+args.region)
 
 
 for var in variable_list:
@@ -163,24 +172,27 @@ for var in variable_list:
       histos[category_names[i_cat]]=[]
       for filename in os.listdir('Analyzer_MuE_'+args.analyzer_name+str(args.Lumi)):
          if "FAKES" in filename or "ETau" in filename or "QCD_with_shapes" in filename:continue
+         if args.region=='ss' and 'QCD' in filename:continue
          file=ROOT.TFile('Analyzer_MuE_'+args.analyzer_name+str(args.Lumi)+'/'+filename)
          new_title=filename.split('.')[0]
-         hist_path="os/"+str(i_cat)+"/"+var[0]
+         hist_path=args.region+"/"+str(i_cat)+"/"+var[0]
          histo=file.Get(hist_path)
         # print histo.GetNbinsX()
          binning=var[2]
 
          if not histo:
             continue
-         try:
-            histo.Rebin(binning*2)
-         except TypeError:
-            histo=histo.Rebin(len(binning)-1,"",binning)
-         except:
-            print "Please fix your binning"
+
+         if new_title!='QCD':
+            try:
+               histo.Rebin(binning*2)
+            except TypeError:
+               histo=histo.Rebin(len(binning)-1,"",binning)
+            except:
+               print "Please fix your binning"
 
 
-         if 'data' not in filename and 'QCD' not in filename and 'TT_DD' not in filename:
+         if 'data' not in filename and 'QCD'!=filename and 'TT_DD' not in filename:
             histo.Scale(lumidict['data_obs']/lumidict[new_title])      
          if 'data' in filename:
             histo.SetBinErrorOption(ROOT.TH1.kPoisson)
@@ -214,7 +226,7 @@ for var in variable_list:
       continue
 
    
-   outputfile=ROOT.TFile(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/preselection/"+var[0]+".root","recreate")
+   outputfile=ROOT.TFile(args.outputdir+"/"+args.analyzer_name+str(args.Lumi)+"/preselection/"+args.region+"/"+var[0]+".root","recreate")
 
 #   print outputfile
    outputfile.cd()

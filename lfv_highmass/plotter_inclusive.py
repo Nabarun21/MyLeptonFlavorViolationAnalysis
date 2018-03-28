@@ -99,7 +99,7 @@ analyzer=args.analyzer
 variable=args.variable
 channel = args.channel
 higgsSF = args.higgsSF
-fileName = "preprocessed_inputs/"+args.analyzer+str(args.Lumi)+"/inclusive/"+args.inputFile
+fileName = "preprocessed_inputs/"+args.analyzer+str(args.Lumi)+"/inclusive/"+args.region+"/"+args.inputFile
 Lumi=args.Lumi
 
 
@@ -189,7 +189,8 @@ new_idx=ROOT.gROOT.GetListOfColors().GetSize() + 1
 trans=ROOT.TColor(new_idx, adapt.GetRed(), adapt.GetGreen(),adapt.GetBlue(), "",0.5)
 
 hist_ZTT=file.Get("mutaue_inclus").Get("ZTauTau")
-hist_Fakes=file.Get("mutaue_inclus").Get("QCD")
+if args.region!='ss':
+    hist_Fakes=file.Get("mutaue_inclus").Get("QCD")
 #hist_Fakes.Add(file.Get("mutaue_inclus").Get("W"))
 hist_W=file.Get("mutaue_inclus").Get("W")
 if args.is_TT_DD==0:
@@ -231,13 +232,14 @@ for k in range(1,hist_ZTT.GetSize()-1):
    hist_ZTT.SetBinError(k,(squared_sum_others*hist_ZTT.GetBinContent(k)*hist_ZTT.GetBinContent(k)+0.10*hist_ZTT.GetBinContent(k)*0.10*hist_ZTT.GetBinContent(k)+hist_ZTT.GetBinError(k)*hist_ZTT.GetBinError(k))**0.5)
    hist_ZL.SetBinError(k,(squared_sum_others*hist_ZL.GetBinContent(k)*hist_ZL.GetBinContent(k)+0.12*hist_ZL.GetBinContent(k)*0.12*hist_ZL.GetBinContent(k)+hist_ZL.GetBinError(k)*hist_ZL.GetBinError(k))**0.5)
    hist_VV.SetBinError(k,(squared_sum_others*hist_VV.GetBinContent(k)*hist_VV.GetBinContent(k)+0.05*hist_VV.GetBinContent(k)*0.05*hist_VV.GetBinContent(k)+hist_VV.GetBinError(k)*hist_VV.GetBinError(k))**0.5)
-   hist_Fakes.SetBinError(k,(squared_sum_others*hist_Fakes.GetBinContent(k)*hist_Fakes.GetBinContent(k)+0.30*hist_Fakes.GetBinContent(k)*0.30*hist_Fakes.GetBinContent(k)+hist_Fakes.GetBinError(k)*hist_Fakes.GetBinError(k))**0.5)
+   if args.region!='ss':
+       hist_Fakes.SetBinError(k,(squared_sum_others*hist_Fakes.GetBinContent(k)*hist_Fakes.GetBinContent(k)+0.30*hist_Fakes.GetBinContent(k)*0.30*hist_Fakes.GetBinContent(k)+hist_Fakes.GetBinError(k)*hist_Fakes.GetBinError(k))**0.5)
    hist_W.SetBinError(k,(squared_sum_others*hist_W.GetBinContent(k)*hist_W.GetBinContent(k)+0.1*hist_W.GetBinContent(k)*0.1*hist_W.GetBinContent(k)+hist_W.GetBinError(k)*hist_W.GetBinError(k))**0.5)
 
 #   Hist_SM.SetBinError(k,(squared_sum_others*hist_SM+0.10*hist_SM.GetBinContent(k)*0.10*hist_SM.GetBinContent(k)+hist_SM.GetBinError(k)*hist_SM.GetBinError(k))**0.5)
-
-hist_Fakes.SetFillColor(ROOT.TColor.GetColor("#ffccff"))
-hist_Fakes.SetLineColor(1)
+if args.region!='ss':
+    hist_Fakes.SetFillColor(ROOT.TColor.GetColor("#ffccff"))
+    hist_Fakes.SetLineColor(1)
 hist_VV.SetFillColor(ROOT.TColor.GetColor("#12cadd"))
 hist_VV.SetLineColor(1)
 hist_W.SetFillColor(ROOT.TColor.GetColor("#32CD32"))
@@ -272,14 +274,16 @@ mystack=ROOT.THStack("mystack","")
 mystack.Add(hist_W)
 #mystack.Add(hist_SM)
 mystack.Add(hist_VV)
-mystack.Add(hist_Fakes)
+if args.region!='ss':
+    mystack.Add(hist_Fakes)
 mystack.Add(hist_TT)
 mystack.Add(hist_ZL)
 mystack.Add(hist_ZTT)
 
-errorBand=hist_Fakes.Clone()
+errorBand=hist_VV.Clone()
 #errorBand.Add(hist_SM)
-errorBand.Add(hist_VV)
+if args.region!='ss':
+    errorBand.Add(hist_Fakes)
 errorBand.Add(hist_W)
 errorBand.Add(hist_TT)
 errorBand.Add(hist_ZL)
@@ -340,12 +344,13 @@ for histo in signal_histos:
             hist_data.SetBinError(bin,0)
 
 #always blind discriminating mass histos after a certain value excpet when plotting CRs 
-start_blinding_at=160 #(GeV)
-if 'mass' in variable and "CR" not in args.analyzer:
-    start_bin=hist_data.FindFixBin(start_blinding_at)
-    for bin in range(start_bin,hist_data.GetNbinsX()+1):
-        hist_data.SetBinContent(bin,0)
-        hist_data.SetBinError(bin,0)
+if args.region!='ss':
+    start_blinding_at=160 #(GeV)
+    if 'mass' in variable and "CR" not in args.analyzer:
+        start_bin=hist_data.FindFixBin(start_blinding_at)
+        for bin in range(start_bin,hist_data.GetNbinsX()+1):
+            hist_data.SetBinContent(bin,0)
+            hist_data.SetBinError(bin,0)
 
 #mystack.SetMaximum(1000*mystack.GetMaximum())
 if args.isLog:
@@ -381,7 +386,8 @@ legend.AddEntry(hist_ZL, "Z#rightarrowee/#mu#mu","f")
 legend.AddEntry(hist_TT, "t#bar{t},t+jets","f")
 legend.AddEntry(hist_VV, "Diboson","f")
 legend.AddEntry(hist_W, "W Bkgs.","f")
-legend.AddEntry(hist_Fakes, "W/QCD","f")
+if args.region!='ss':
+    legend.AddEntry(hist_Fakes, "QCD","f")
 #legend.AddEntry(hist_SM, "SM Higgs","f")
 #if "QCD" in analyzer or "SR" in analyzer:
 for histo in signal_histos:

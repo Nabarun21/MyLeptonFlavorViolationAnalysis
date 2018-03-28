@@ -21,7 +21,7 @@ mv GluGlu_LFV_HToMuTau_M600_13TeV*.root LFV600.root
 mv GluGlu_LFV_HToMuTau_M750_13TeV*.root LFV750.root 
 mv GluGlu_LFV_HToMuTau_M900_13TeV*.root LFV900.root 
 
-mv QCD_Pt-20toInf_MuEnrichedPt15_TuneCUETP8M1_13TeV_pythia8_v6-v1.root QCD_mc.root
+
 
 
 #mv GluGlu_LFV_HToMuTau_M125_13TeV*.root LFVGG125.root
@@ -62,4 +62,3 @@ rm *evtgen*
 rm *HToMuTau*
 rm GluGlu*
 rm VBF*
-rm QCD_Pt-20toInf_MuEnrichedPt15_TuneCUETP8M1_13TeV_pythia8_v6-v1.root
