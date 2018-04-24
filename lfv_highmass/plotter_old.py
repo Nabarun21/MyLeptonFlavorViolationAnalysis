@@ -83,7 +83,7 @@ parser.add_argument(
     action="store",
     dest="higgsSF",
     default=5,
-    help="Provide the Scale Factor for the SM-Higgs signals.  5x is default for linear")
+    help="Provide the Scale Factor for the SM-Higgs signals.  40x is default for linear")
 parser.add_argument(
     "--higgsSFSM",
     type=int,
@@ -230,15 +230,14 @@ def add_Preliminary():
     lumi.AddText("Preliminary")
     return lumi
 
-def make_legend(x1=0.42,y1=0.5,x2=0.92,y2=0.85):
-	if 'dphi' in variable:# and 'Met' in variable:
-            x1=x1-0.03
-            x2=x2-0.03
-            y1=0.56
+def make_legend():
+	if 'dphi' in variable and 'Met' in variable:
+	   output = ROOT.TLegend(0.30, 0.6, 0.92, 0.88, "", "brNDC")
+           output.SetNColumns(5)
+	else:
            #output = ROOT.TLegend(0.65, 0.3, 0.92, 0.85, "", "brNDC")
-        output = ROOT.TLegend(x1, y1,x2,y2, "", "brNDC")
-#           output.SetNColumns(2)
-        output.SetNColumns(1)
+	   output = ROOT.TLegend(0.42, 0.5, 0.92, 0.85, "", "brNDC")
+           output.SetNColumns(2)
         #output = ROOT.TLegend(0.2, 0.1, 0.47, 0.65, "", "brNDC")
         output.SetLineWidth(0)
         output.SetLineStyle(0)
@@ -456,24 +455,12 @@ for cat in categories:
         hists[ sig ].Draw("histsame")
     hists["data_obs"].Draw("esame")
  
-    legend1=make_legend(x2=0.62)
-    legend2=make_legend(x1=0.65)
+    legend=make_legend()
     for name, val in infoMap.iteritems() :
-        if name in bkgs:
-            legend1.AddEntry(hists[name], val[1], val[2])
-    legend1.AddEntry(errorBand,"Bkg. unc.","f")
-
-    legend2.AddEntry(None,"LFV H#rightarrow#mu#tau_{e}","")
-    legend2.AddEntry(None,"M_{H}   "+"{:.2f}#timesxs(BSM)".format(0.01*higgsSF),"")
-
-    for name, val in infoMap.iteritems() :
-        if name in signals:
-            legend2.AddEntry(hists[name], val[1], val[2])
-
-
-
-    legend1.Draw()
-    legend2.Draw()
+        if name in bkgs or name in signals:
+            legend.AddEntry(hists[name], val[1], val[2])
+    legend.AddEntry(errorBand,"Bkg. unc.","f")
+    legend.Draw()
     
     l1=add_lumi()
     l1.Draw("same")

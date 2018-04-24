@@ -1,7 +1,9 @@
-#mv GluGluHToWWTo2L2Nu_M125_13TeV_powheg_pythia8_v6-v1.root ggH_hww.root
-#mv VBFHToWWTo2L2Nu_M125_13TeV_powheg_pythia8_v6-v1.root qqH_hww.root
+mv GluGluHToWWTo2L2Nu_M125_13TeV_powheg_pythia8_v6-v1.root ggH_hww.root
+mv VBFHToWWTo2L2Nu_M125_13TeV_powheg_pythia8_v6-v1.root qqH_hww.root
 
-#mv GluGluHToTauTau_M125_13TeV*.root  ggH_htt.root             
+mv GluGluHToTauTau_M125_13TeV*.root  ggH_htt.root             
+
+mv VBFHToTauTau_M125_13TeV_powheg_pythia8_v6-v1.root qqH_htt.root
 
 #hadd -f  qqH_htt.root WminusHToTauTau_M125_13TeV_powheg_pythia8_v6-v1.root WplusHToTauTau_M125_13TeV_powheg_pythia8_v6-v1.root ZHToTauTau_M125_13TeV_powheg_pythia8_v6-v1.root VBFHToTauTau_M125_13TeV_powheg_pythia8_v6-v1.root  ttHJetToTT_M125_13TeV_amcatnloFXFX_madspin_pythia8_v6_ext4-v1.root
 

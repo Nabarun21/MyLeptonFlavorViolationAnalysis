@@ -44,7 +44,7 @@ parser.add_argument(
     type=int,
     action="store",
     dest="Lumi",
-    default=35847,
+    default=35858,
     help="Which channel to run over? (et, mt, em, me)")
 parser.add_argument(
     "--analyzer",
@@ -92,7 +92,7 @@ analyzer=args.analyzer
 variable=args.variable
 channel = args.channel
 higgsSF = args.higgsSF
-fileName = "preprocessed_inputs/"+args.analyzer+str(args.Lumi)+"/inclusive/"+args.inputFile
+fileName = "preprocessed_inputs/"+args.analyzer+str(args.Lumi)+"/inclusive/os/"+args.inputFile
 Lumi=args.Lumi
 
 
@@ -201,8 +201,9 @@ for histo in signal_histos:
     histo[0].SetLineWidth(4)
     histo[0].Scale(1/histo[0].Integral())
     histo[0].SetTitle("")
+    print histo[1],"   ",histo[0].GetMaximum()
     max_y=max(histo[0].GetMaximum(),max_y)
-    print "ass ",max_y
+
 
 signal_histos[0][0].GetXaxis().SetTitleSize(0.053)
 signal_histos[0][0].GetXaxis().SetNdivisions(505)

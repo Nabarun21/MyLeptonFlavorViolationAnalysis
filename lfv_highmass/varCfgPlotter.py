@@ -71,32 +71,34 @@ def getInfoMap( higgsSF, channel, shift="" ) :
     infoMap["ZTT"] = [["ZTauTau"+shift],"Z#rightarrow#tau#tau","f","#ffcc66",0.10]
     infoMap["ZJ"] = [["Zothers"+shift],"Z#rightarrowee/#mu#mu","f","#4496c8",0.10]
     infoMap["TT"] = [["TT"+shift,"T"+shift],"t#bar{t},t+jets","f","#9999cc",0.12]
-    infoMap["TT_DD"] = [["TT_DD"+shift,"T"+shift],"t#bar{t},t+jets","f","#9999cc",0.12]
-    infoMap["Diboson"] = [["Diboson"+shift],"Diboson","f","#12cadd",0.05]
+#    infoMap["TT_DD"] = [["TT_DD"+shift,"T"+shift],"t#bar{t},t+jets","f","#9999cc",0.12]
+    if channel == "em" or channel == "me":
+       infoMap["SMH"] = [["ggH_htt"+shift,"qqH_htt"+shift,"ggH_hww"+shift,"qqH_hww"+shift],"SM Higgs","f","#c243cd",0.1]
     if channel=="et" or channel=="mt":
        infoMap["QCD"] = [["Fakes",],"Reducible","f","#ffccff"]
     if channel == "me" or channel=="em":
 #       infoMap["QCD"] = [["QCD","W"+shift],"W/QCD","f","#ffccff",0.30]
        infoMap["QCD"] = [["QCD"],"QCD","f","#ffccff",0.30]
        infoMap["W"] = [["W"+shift],"W Bkgs.","f","#32CD32",0.10]
+    infoMap["Diboson"] = [["Diboson"+shift],"Diboson","f","#12cadd",0.05]
     if channel=="em" or channel=="et":
-       infoMap["H125"] = [["LFVGG125"+shift,"LFVVBF125"+shift,],"H#rightarrowe#tau (B=%i%%)"%higgsSF,"l","#111bbb"]
+       infoMap["H125"] = [["LFVGG125"+shift,"LFVVBF125"+shift,],"H#rightarrowe#tau (B=%i%%)"%higgsSF,"l","#111bbb",'add_error!']
     elif channel=="me" or channel=="mt":
-       infoMap["LFV200"] = [["LFV200"],"LFV200","l",ROOT.kRed,0,1]
-       infoMap["LFV300"] = [["LFV300"],"LFV300","l",ROOT.kBlack,0,1]
-       infoMap["LFV450"] = [["LFV450"],"LFV450","l",ROOT.kBlue,0,1]
-       infoMap["LFV600"] = [["LFV600"],"LFV600","l",ROOT.kRed,0,2]
-       infoMap["LFV750"] = [["LFV750"],"LFV750","l",ROOT.kBlack,0,2]
-       infoMap["LFV900"] = [["LFV900"],"LFV900","l",ROOT.kBlue,0,2]
+       infoMap["LFV200"] = [["LFV200"],"200   {:.3f}pb".format((0.01*higgsSF*16.94)),"l",ROOT.kRed,0,1]
+       infoMap["LFV300"] = [["LFV300"],"300   {:.3f}pb".format((0.01*higgsSF*6.59)),"l",ROOT.kBlack,0,1]
+       infoMap["LFV450"] = [["LFV450"],"450   {:.3f}pb".format((0.01*higgsSF*2.3)),"l",ROOT.kBlue,0,1]
+       infoMap["LFV600"] = [["LFV600"],"600   {:.3f}pb".format((0.01*higgsSF*1.01)),"l",ROOT.kRed,0,2]
+       infoMap["LFV750"] = [["LFV750"],"750   {:.3f}pb".format((0.01*higgsSF*0.4969)),"l",ROOT.kBlack,0,2]
+       infoMap["LFV900"] = [["LFV900"],"900   {:.3f}pb".format((0.01*higgsSF*0.2685)),"l",ROOT.kBlue,0,2]
 
     return infoMap
 
 
 def getBackgrounds(channel,is_TT_DD=None,region='os') :
     if channel=="em" or channel=="me":    
-       bkgs=["Diboson","QCD" ,"W","TT", "ZTT", "ZJ"] #["QCD","W","Diboson", "TT", "ZTT", "ZJ"]
+       bkgs=["Diboson","QCD" ,"W",'SMH',"TT", "ZTT", "ZJ"] #["QCD","W","Diboson", "TT", "ZTT", "ZJ"]
        if region=='ss':
-           bkgs=["Diboson","W","TT", "ZTT", "ZJ"] #["QCD","W","Diboson", "TT", "ZTT", "ZJ"]
+           bkgs=["Diboson","W","SMH","TT", "ZTT", "ZJ"] #["QCD","W","Diboson", "TT", "ZTT", "ZJ"]
        if is_TT_DD==1:
            bkgs=["QCD","W","Diboson", "TT_DD", "ZTT", "ZJ"]
        return bkgs

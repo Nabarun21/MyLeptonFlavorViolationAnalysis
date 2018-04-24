@@ -53,11 +53,11 @@ python computeQCD.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType
 
 python computeQCD_with_shapes.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat
 
-
 #folder for plotting
 mv QCD$analyzer.root Analyzer_MuE_$analyzer$luminosity/QCD.root
 
 mv QCD${analyzer}_with_shapes.root Analyzer_MuE_$analyzer$luminosity/QCD_with_shapes.root
+
 #compute TTBar from CR data
 #if [ "X"${isTT_DD} != "X" ]  
 #    then
@@ -71,15 +71,17 @@ mv QCD${analyzer}_with_shapes.root Analyzer_MuE_$analyzer$luminosity/QCD_with_sh
 
 #final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . INCLUSIVE
 python do_lumiweight_inclusive.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype 
+python do_lumiweight_inclusive.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype --region ss
 
 
 #final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . PRESEL_CATEGORY_WISE
 python do_lumiweight_presel.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat
+python do_lumiweight_presel.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat --region ss
 
 
 #final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . FINAL_SEL_CATEGORY_WISE
 python do_lumiweight_sel.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat
+python do_lumiweight_sel.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat --region ss
 
-
-#final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . FINAL_SEL_CATEGORY_WISE
+#final preprocessing : weight lumi, fill empty bins etc, create separate root file for each variable for plotting . FINAL_SEL_CATEGORY_WISE WITH SHAPES
 python do_lumiweight_sel_shapes.py --aName $analyzer --lumi $luminosity --jobid $jobid --aType $analtype  --numCategories $num_cat

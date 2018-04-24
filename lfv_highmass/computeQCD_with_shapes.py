@@ -147,7 +147,8 @@ class GetQCD(object):
 	def __init__(self):
 		self.histos={}
                 self.histomc=None
-	        self.histodata=None
+		self.histodata=None
+
 	        self.histoQCD=None
 		self.datafile=file=ROOT.TFile(Analyzer+str(args.Lumi)+"/data_obs.root")
 		print self.datafile
@@ -156,7 +157,19 @@ class GetQCD(object):
 	        	for sign in regions:#,'antiIsolatedweightedmuonelectron/ss','antiIsolatedweightedelectron/ss','antiIsolatedweightedmuon/ss']:
 	        		for j in ['fullsel']:
 	        			for i in range(len(categories)):
-						self.histodata=self.datafile.Get(sign+"/"+str(i )+"/selected/nosys/"+var[0])
+						self.histodata=None
+			
+						histodata=self.datafile.Get(sign+"/"+str(i )+"/selected/nosys/"+var[0])
+						
+						try:
+							histodata.Rebin(binning*2)
+						except TypeError:
+							histodata=histodata.Rebin(len(binning)-1,"",binning)
+						except:
+							print "Please fix your binning"
+						self.histodata=histodata.Clone()
+						self.histodata.SetDirectory(0)
+
 						for k in range(len(syst_names_analyzer)):
 
 							hist_path= sign+"/"+str(i)+"/selected/"+syst_names_analyzer[k]+"/"+var[0]
