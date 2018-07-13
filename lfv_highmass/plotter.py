@@ -374,7 +374,13 @@ for cat in categories:
     errorBand=hists["ZTT"].Clone()
     for bkg in bkgs :
 	if bkg == "SMH" : 
-	     hists[ bkg ].Scale(higgsSFSM)
+            hists[ bkg ].Scale(higgsSFSM)
+        
+#        if bkg == "TT":
+#            if suffix=='presel':
+ #           hists[ bkg ].Scale(0.885591123589)            
+           # else:
+            #    hists[ bkg ].Scale(0.618959690883)            
 
         if bkg == "ZTT" : continue
         errorBand.Add(hists[bkg])

@@ -1,3 +1,4 @@
+import binning
 import array
 import os
 from sys import argv, stdout, stderr
@@ -77,6 +78,7 @@ lumidict['DY']=1.0
 lumidict['Zothers']=1.0
 lumidict['ZTauTau']=1.0
 lumidict['ggH_htt']=1.0
+lumidict['SMH']=1.0
 lumidict['qqH_htt']=1.0
 lumidict['ggH_hww']=1.0
 lumidict['qqH_hww']=1.0
@@ -101,6 +103,7 @@ lumidict2['DY']=2.1e-05
 lumidict2['Zothers']=2.1e-05
 lumidict2['ZTauTau']=2.1e-05
 lumidict2['ggH_htt']=2.07e-06
+lumidict2['SMH']=2.07e-06
 lumidict2['qqH_htt']=4.2e-08
 lumidict2['ggH_hww']=2.07e-06
 lumidict2['qqH_hww']=4.2e-08
@@ -231,13 +234,12 @@ syst_names_datacard=['nominal_no_name','CMS_MES_13TeVUp','CMS_MES_13TeVDown','CM
              'CMS_Jes_JetSinglePionHCAL_13TeVUp',
              'CMS_Jes_JetTimePtEta_13TeVUp']      #sysfolder names in analyzer
 
-print len(syst_names_datacard)
-print len(syst_names_analyzer)
+#print len(syst_names_datacard)
+#print len(syst_names_analyzer)
 
-col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,990,50)+range(1000,1520,100)))
-#met_vars_binning=array.array('d',(range(0,190,20)+range(200,580,40)+range(600,1010,100)))
-#pt_vars_binning=array.array('d',(range(0,190,20)+range(200,500,40)))
-
+col_vis_mass_binning=binning.binning('colmass')
+met_vars_binning=binning.binning('met')
+pt_vars_binning=binning.binning('pt')
 
 
 variable_list=[
@@ -270,6 +272,7 @@ for var in variable_list:
          if "FAKES" in filename or "ETau" in filename or filename=='QCD.root':continue
          file=ROOT.TFile('Analyzer_MuE_'+args.analyzer_name+str(args.Lumi)+'/'+filename)
          title=filename.split('.')[0].replace("_with_shapes","")
+         
          for k in range(len(syst_names_analyzer)):
             hist_path="os/"+str(i_cat)+"/selected/"+syst_names_analyzer[k]+"/"+var[0]
             histo=file.Get(hist_path)
@@ -289,6 +292,8 @@ for var in variable_list:
                   histo=histo.Rebin(len(binning)-1,"",binning)
                except:
                   print "Please fix your binning"
+            
+            if title=='TT':histo.Scale(0.885591123589)
 
 
             if 'data' not in filename and 'QCD' not in filename and 'TT_DD' not in filename and "_with_shapes" not in filename:
@@ -313,6 +318,8 @@ for var in variable_list:
                    histo.SetBinContent(j,0.001*float((lumidict['data_obs'])*float(lumidict2[title])))
                    histo.SetBinError(j,1.8*float((lumidict['data_obs'])*float(lumidict2[title])))
              #            print "found neg bin  ",j
+            if title=='ggH_htt':
+               title='SMH'
             if 'nominal' not in syst_names_datacard[k]:
                new_title=title+"_"+syst_names_datacard[k]
             else:

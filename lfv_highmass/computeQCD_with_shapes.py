@@ -1,3 +1,4 @@
+import binning
 import array
 import os 
 from sys import argv, stdout, stderr
@@ -118,10 +119,9 @@ syst_names_analyzer=['mesup','mesdown','eesup','eesdown','eresrhoup','eresrhodow
                 'jes_JetSinglePionHCALUp',
                 'jes_JetTimePtEtaUp']      #sysfolder names in analyzer
 
-
-col_vis_mass_binning=array.array('d',(range(0,190,20)+range(200,480,30)+range(500,990,50)+range(1000,1520,100)))
-met_vars_binning=array.array('d',(range(0,190,20)+range(200,580,40)+range(600,1010,100)))
-pt_vars_binning=array.array('d',(range(0,190,20)+range(200,500,40)))
+col_vis_mass_binning=binning.binning('colmass')
+met_vars_binning=binning.binning('met')
+pt_vars_binning=binning.binning('pt')
 
 variables = [
 #	('BDT_value', 'BDT_value', 1),

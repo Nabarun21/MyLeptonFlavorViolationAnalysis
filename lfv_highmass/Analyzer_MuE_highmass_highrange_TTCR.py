@@ -89,11 +89,11 @@ eId_corrector = EGammaPOGCorrections.make_egamma_pog_electronID_MORIOND2017( 'no
 erecon_corrector=EGammaPOGCorrections.make_egamma_pog_recon_MORIOND17()
 zpt_file=ROOT.TFile("zpt_weights_2016_BtoH.root")
 
-class Analyzer_MuE_highmass_lowrange_TTCR2(MegaBase):
+class Analyzer_MuE_highmass_highrange_TTCR(MegaBase):
     tree = 'em/final/Ntuple'
     def __init__(self, tree, outfile, **kwargs):
         self.channel='EMu'
-        super(Analyzer_MuE_highmass_lowrange_TTCR2, self).__init__(tree, outfile, **kwargs)
+        super(Analyzer_MuE_highmass_highrange_TTCR, self).__init__(tree, outfile, **kwargs)
         target = os.path.basename(os.environ['megatarget'])
         self.target=target
 
@@ -884,20 +884,14 @@ class Analyzer_MuE_highmass_lowrange_TTCR2(MegaBase):
             cut_flow_trk.Fill('surplus_tau_veto')
 
  
+ 
             nbtagged=row.bjetCISVVeto30Medium
-            if nbtagged>2:
+            if nbtagged!=1:
                 continue
             btagweight=1
-            if (self.isData and nbtagged>0):
-                continue
-            if nbtagged>0:
-                if nbtagged==1:
-                    btagweight=bTagSF.bTagEventWeight(nbtagged,row.jb1pt,row.jb1hadronflavor,row.jb2pt,row.jb2hadronflavor,1,0,0) if (row.jb1pt>-990 and row.jb1hadronflavor>-990) else 0
-                if nbtagged==2:
-                    btagweight=bTagSF.bTagEventWeight(nbtagged,row.jb1pt,row.jb1hadronflavor,row.jb2pt,row.jb2hadronflavor,1,0,0) if (row.jb1pt>-990 and row.jb1hadronflavor>-990 and row.jb2pt>-990 and row.jb2hadronflavor>-990) else 0
-#                print "btagweight,nbtagged,row.jb1pt,row.jb1hadronflavor,row.jb2pt,row.jb2hadronflavor"," ",btagweight," ",nbtagged," ",row.jb1pt," ",row.jb1hadronflavor," ",row.jb2pt," ",row.jb2hadronflavor
 
-#            if btagweight<0:btagweight=0
+            if not self.isData:
+                   btagweight=bTagSF.bTagEventWeight(nbtagged,row.jb1pt,row.jb1hadronflavor,row.jb2pt,row.jb2hadronflavor,1,0,1) if (row.jb1pt>-990 and row.jb1hadronflavor>-990) else 0
 
             if btagweight==0: continue
 
@@ -1223,11 +1217,6 @@ class Analyzer_MuE_highmass_lowrange_TTCR2(MegaBase):
  #                   category=2 if self.shifted_vbfMass<550 else 3
                 else:
                     category=jn
-
-                if jn==0:
-                    if abs(self.shifted_eDPhiToPfMet)<1.2:continue
-                elif jn==1:
-                    if abs(self.shifted_eDPhiToPfMet)<1.0:continue
                 
                 if sys=='nosys':    
 #                    if category!=4:               
@@ -1236,11 +1225,16 @@ class Analyzer_MuE_highmass_lowrange_TTCR2(MegaBase):
                     self.fill_histos(row,sign,folder,False,region,btagweight,'presel',qcdshaperegion)
 
             
-#                if self.my_muon.Pt() < 60: continue 
-#                if sys=='nosys':
-#                    cut_flow_trk.Fill('sel_mupt')
+                if self.my_muon.Pt() < 150: continue 
+                if sys=='nosys':
+                    cut_flow_trk.Fill('sel_mupt')
                 if self.my_elec.Pt() < 10: continue
-
+                if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.2 : continue
+                if sys=='nosys':
+                    cut_flow_trk.Fill('sel_dphiemu')
+                if abs(self.shifted_eDPhiToPfMet) > 0.3 : continue
+                if sys=='nosys':
+                    cut_flow_trk.Fill('sel_dphiemet')
 
                 folder = sign+'/'+str(int(category))+'/selected/'+sys
                 self.fill_histos(row,sign,folder,False,region,btagweight,sys,qcdshaperegion,self.pileup)
@@ -1329,10 +1323,10 @@ class Analyzer_MuE_highmass_lowrange_TTCR2(MegaBase):
                 self.shifted_mMtToPfMet=transMass(self.my_muon,self.my_MET)
                 self.shifted_eMtToPfMet=transMass(self.my_elec,self.my_MET)
             
-                if self.my_muon.Pt() < 60: continue 
+                if self.my_muon.Pt() < 150: continue 
                 if self.my_elec.Pt() < 10: continue
                 if deltaPhi(self.my_elec.Phi(),self.my_muon.Phi()) < 2.2 : continue
-                if abs(self.shifted_eDPhiToPfMet) > 0.7 : continue
+                if abs(self.shifted_eDPhiToPfMet) > 0.3 : continue
 
 
                 folder = sign+'/'+str(int(category))+'/selected/'+jetsys

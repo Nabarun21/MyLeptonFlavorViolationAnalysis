@@ -197,6 +197,7 @@ if args.is_TT_DD==0:
     hist_TT=file.Get("mutaue_inclus").Get("TT")
 else:
     hist_TT=file.Get("mutaue_inclus").Get("TT_DD")
+hist_TT.Scale(0.855636610815)
 hist_TT.Add(file.Get("mutaue_inclus").Get("T"))
 #hist_sig200=file.Get("mutaue_inclus").Get("LFV200")
 #hist_sig300=file.Get("mutaue_inclus").Get("LFV300")
@@ -218,9 +219,9 @@ hist_VV=file.Get("mutaue_inclus").Get("Diboson")
 hist_data=file.Get("mutaue_inclus").Get("data_obs")
 hist_ZL=file.Get("mutaue_inclus").Get("Zothers")
 hist_SM=file.Get("mutaue_inclus").Get("ggH_htt")
-hist_SM.Add(file.Get("mutaue_inclus").Get("qqH_htt"))
-hist_SM.Add(file.Get("mutaue_inclus").Get("ggH_hww"))
-hist_SM.Add(file.Get("mutaue_inclus").Get("qqH_hww"))
+#hist_SM.Add(file.Get("mutaue_inclus").Get("qqH_htt"))
+#hist_SM.Add(file.Get("mutaue_inclus").Get("ggH_hww"))
+#hist_SM.Add(file.Get("mutaue_inclus").Get("qqH_hww"))
  
 Lumi_uncert=0.026
 e_eff_uncert=0.02

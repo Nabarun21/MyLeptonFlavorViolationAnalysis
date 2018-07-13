@@ -73,7 +73,8 @@ def getInfoMap( higgsSF, channel, shift="" ) :
     infoMap["TT"] = [["TT"+shift,"T"+shift],"t#bar{t},t+jets","f","#9999cc",0.12]
 #    infoMap["TT_DD"] = [["TT_DD"+shift,"T"+shift],"t#bar{t},t+jets","f","#9999cc",0.12]
     if channel == "em" or channel == "me":
-       infoMap["SMH"] = [["ggH_htt"+shift,"qqH_htt"+shift,"ggH_hww"+shift,"qqH_hww"+shift],"SM Higgs","f","#c243cd",0.1]
+    #   infoMap["SMH"] = [["ggH_htt"+shift,"qqH_htt"+shift,"ggH_hww"+shift,"qqH_hww"+shift],"SM Higgs","f","#c243cd",0.1]
+       infoMap["SMH"] = [["ggH_htt"+shift],"SM Higgs","f","#c243cd",0.1]
     if channel=="et" or channel=="mt":
        infoMap["QCD"] = [["Fakes",],"Reducible","f","#ffccff"]
     if channel == "me" or channel=="em":
